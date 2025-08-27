@@ -1,0 +1,49 @@
+{
+    "level": 1,
+    "player": {
+        "startX": 50,
+        "startY": 400,
+        "width": 30,
+        "height": 50,
+        "color": "#000000"
+    },
+    "platforms": [
+        {
+            "x": 0,
+            "y": 450,
+            "width": 910,
+            "height": 50,
+            "color": "#F4A460"
+        }
+    ],
+    "traps": [
+        {
+            "x": 700,
+            "y": 450,
+            "width": 80,
+            "height": 50,
+            "color": "#8B4513",
+            "type": "moving_hole",
+            "movement": {
+                "direction": "left",
+                "triggerDistance": 90,
+                "speed": 3
+            }
+        }
+    ],
+    "goal": {
+        "x": 850,
+        "y": 400,
+        "width": 40,
+        "height": 50,
+        "color": "#C0C0C0"
+    },
+    "background": {
+        "color": "#8B4513"
+    },
+    "sound": {
+        "jump": "assets/sounds/jump.wav",
+        "trap": "assets/sounds/trap.wav",
+        "win": "assets/sounds/win.wav"
+    }
+}

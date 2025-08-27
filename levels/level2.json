@@ -1,0 +1,92 @@
+{
+    "level": 2,
+    "player": {
+        "startX": 800,
+        "startY": 100,
+        "width": 30,
+        "height": 50,
+        "color": "#000000"
+    },
+    "platforms": [
+        {
+            "x": 700,
+            "y": 200,
+            "width": 210,
+            "height": 50,
+            "color": "#F4A460"
+        },
+        {
+            "x": 600,
+            "y": 250,
+            "width": 210,
+            "height": 50,
+            "color": "#F4A460"
+        },
+        {
+            "x": 500,
+            "y": 300,
+            "width": 210,
+            "height": 50,
+            "color": "#F4A460"
+        },
+        {
+            "x": 400,
+            "y": 350,
+            "width": 210,
+            "height": 50,
+            "color": "#F4A460"
+        },
+        {
+            "x": 300,
+            "y": 400,
+            "width": 210,
+            "height": 50,
+            "color": "#F4A460"
+        },
+        {
+            "x": 0,
+            "y": 450,
+            "width": 910,
+            "height": 50,
+            "color": "#F4A460"
+        }
+    ],
+    "traps": [
+        {
+            "x": 250,
+            "y": 440,
+            "width": 40,
+            "height": 20,
+            "color": "#8B4513",
+            "type": "spikes"
+        },
+        {
+            "x": 150,
+            "y": 440,
+            "width": 40,
+            "height": 20,
+            "color": "#8B4513",
+            "type": "moving_spikes",
+            "movement": {
+                "triggerDistance": 75,
+                "direction": "right",
+                "speed": 2
+            }
+        }
+    ],
+    "goal": {
+        "x": 50,
+        "y": 400,
+        "width": 40,
+        "height": 50,
+        "color": "#C0C0C0"
+    },
+    "background": {
+        "color": "#8B4513"
+    },
+    "sound": {
+        "jump": "assets/sounds/jump.wav",
+        "trap": "assets/sounds/trap.wav",
+        "win": "assets/sounds/win.wav"
+    }
+}
