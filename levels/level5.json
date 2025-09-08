@@ -1,0 +1,39 @@
+{
+    "level": 5,
+    "player": {
+        "startX": 20,
+        "startY": 150,
+        "width": 30,
+        "height": 50,
+        "color": "#000000"
+    },
+    "platforms": [
+        { "x": 0,   "y": 200, "width": 70, "height": 20, "color": "#B97A1A" },
+        { "x": 80,  "y": 250, "width": 70, "height": 20, "color": "#B97A1A" },
+        { "x": 160, "y": 300, "width": 70, "height": 20, "color": "#B97A1A" },
+        { "x": 240, "y": 350, "width": 70, "height": 20, "color": "#B97A1A" },
+        { "x": 320, "y": 400, "width": 70, "height": 20, "color": "#B97A1A" },
+        { "x": 400, "y": 350, "width": 70, "height": 20, "color": "#B97A1A" },
+        { "x": 480, "y": 300, "width": 70, "height": 20, "color": "#B97A1A" },
+        { "x": 560, "y": 250, "width": 70, "height": 20, "color": "#B97A1A" },
+        { "x": 640, "y": 200, "width": 70, "height": 20, "color": "#B97A1A" },
+        { "x": 720, "y": 150, "width": 70, "height": 20, "color": "#B97A1A" },
+        { "x": 0, "y": 510, "width": 910, "height": 40, "color": "#B97A1A" }
+    ],
+    "traps": [],
+    "goal": {
+        "x": 750,
+        "y": 100,
+        "width": 40,
+        "height": 50,
+        "color": "#C0C0C0"
+    },
+    "background": {
+        "color": "#D89B36"
+    },
+    "sound": {
+        "jump": "assets/sounds/jump.wav",
+        "trap": "assets/sounds/trap.wav",
+        "win": "assets/sounds/win.wav"
+    }
+}

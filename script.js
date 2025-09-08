@@ -11,6 +11,9 @@ let gravity = 0.5;
 let keys = {};
 let platforms = [];
 let traps = [];
+let level7SpikeTimerStarted = false;
+let level7SpikeTimeout = null;
+const victoryMusic = new Audio('assets/sounds/victory.mp3'); // Add a happy victory music file (you need to provide this file)
 let lives = 5;
 let timer = 0;
 let gameInterval;
@@ -52,35 +55,151 @@ function getSavedLevel() {
 // Start game logic
 function startGame(levelNum) {
     console.log(`Starting game at level: ${levelNum}`);
-    
+// Show a victory animation and play happy music after level 10
+function showVictoryAnimation() {
+    stopAllSounds();
+    if (soundEnabled) {
+        victoryMusic.currentTime = 0;
+        victoryMusic.play();
+    }
+    // Fade out the canvas and show a big message
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100vw';
+    overlay.style.height = '100vh';
+    overlay.style.background = 'rgba(0,0,0,0.95)';
+    overlay.style.display = 'flex';
+    overlay.style.flexDirection = 'column';
+    overlay.style.justifyContent = 'center';
+    overlay.style.alignItems = 'center';
+    overlay.style.zIndex = '99999';
+    overlay.style.transition = 'opacity 1s';
+    overlay.style.opacity = '0';
+    document.body.appendChild(overlay);
+    setTimeout(() => { overlay.style.opacity = '1'; }, 10);
+
+    // Add animated text
+    const msg = document.createElement('h1');
+    msg.textContent = 'You finished the game!';
+    msg.style.color = '#FFD700';
+    msg.style.fontSize = '3rem';
+    msg.style.textShadow = '0 0 20px #ED6509, 0 0 40px #fff';
+    msg.style.marginBottom = '30px';
+    overlay.appendChild(msg);
+
+    // Add a confetti effect (simple canvas)
+    const confettiCanvas = document.createElement('canvas');
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+    confettiCanvas.style.position = 'absolute';
+    confettiCanvas.style.top = '0';
+    confettiCanvas.style.left = '0';
+    overlay.appendChild(confettiCanvas);
+    drawConfetti(confettiCanvas);
+
+    // Add a restart button
+    const restartBtn = document.createElement('button');
+    restartBtn.textContent = 'Play Again';
+    restartBtn.style.background = '#ED6509';
+    restartBtn.style.color = '#fff';
+    restartBtn.style.fontSize = '1.5rem';
+    restartBtn.style.padding = '16px 40px';
+    restartBtn.style.border = 'none';
+    restartBtn.style.borderRadius = '10px';
+    restartBtn.style.marginTop = '40px';
+    restartBtn.style.cursor = 'pointer';
+    restartBtn.style.boxShadow = '0 0 20px #ED6509';
+    restartBtn.addEventListener('click', () => {
+        overlay.remove();
+        victoryMusic.pause();
+        victoryMusic.currentTime = 0;
+        localStorage.setItem('trustIssuesLevel', 1);
+        startGame(1);
+    });
+    overlay.appendChild(restartBtn);
+}
+
+// Simple confetti animation
+function drawConfetti(canvas) {
+    const ctx = canvas.getContext('2d');
+    const confettiCount = 120;
+    const confetti = [];
+    for (let i = 0; i < confettiCount; i++) {
+        confetti.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * -canvas.height,
+            r: 6 + Math.random() * 8,
+            d: Math.random() * 100,
+            color: `hsl(${Math.random() * 360}, 90%, 60%)`,
+            tilt: Math.random() * 10 - 5,
+            tiltAngle: 0,
+            tiltAngleIncremental: (Math.random() * 0.07) + 0.05
+        });
+    }
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        confetti.forEach(c => {
+            ctx.beginPath();
+            ctx.lineWidth = c.r;
+            ctx.strokeStyle = c.color;
+            ctx.moveTo(c.x + c.tilt + c.r / 3, c.y);
+            ctx.lineTo(c.x + c.tilt, c.y + c.r);
+            ctx.stroke();
+        });
+        update();
+        requestAnimationFrame(draw);
+    }
+    function update() {
+        confetti.forEach(c => {
+            c.y += (Math.cos(c.d) + 3 + c.r / 2) / 2;
+            c.x += Math.sin(0.01 * c.d);
+            c.tiltAngle += c.tiltAngleIncremental;
+            c.tilt = Math.sin(c.tiltAngle) * 15;
+            if (c.y > canvas.height) {
+                c.x = Math.random() * canvas.width;
+                c.y = -10;
+            }
+        });
+    }
+    draw();
+}
     // Hide the start screen
     const startScreen = document.getElementById('start-screen');
     if (startScreen) {
         startScreen.style.display = 'none';
     }
-
     // Hide the start button container
     const startButtonContainer = document.querySelector('.start-button-container');
     if (startButtonContainer) {
         startButtonContainer.style.display = 'none';
     }
-
     // Hide the instructions
     const instructionsContainer = document.querySelector('.instructions-centered');
     if (instructionsContainer) {
         instructionsContainer.style.display = 'none';
     }
-
+    // Hide the level select buttons
+    const levelSelect = document.getElementById('levelSelect');
+    if (levelSelect) {
+        levelSelect.style.display = 'none';
+    }
     // Show the game canvas
     canvas.style.display = 'block';
     lives = 5;
-
     // Load the specified level
     loadLevel(levelNum);
 }
 
 // Load level from JSON
 function loadLevel(levelNum) {
+    // Reset level 7 spike timer state
+    level7SpikeTimerStarted = false;
+    if (level7SpikeTimeout) {
+        clearTimeout(level7SpikeTimeout);
+        level7SpikeTimeout = null;
+    }
     goalReached = false;
     currentLevel = levelNum;
     console.log(`Loading level: ${levelNum}`); // Debugging log
@@ -94,6 +213,15 @@ function loadLevel(levelNum) {
             // Deep copy traps so each reload starts fresh
             traps = (data.traps || []).map(trap => JSON.parse(JSON.stringify(trap)));
 
+            // For level 7, hide spikes with appearAfterMove until triggered
+            if (levelNum === 7) {
+                traps.forEach(t => {
+                    if (t.appearAfterMove) {
+                        t.hidden = true;
+                    }
+                });
+            }
+
             player = {
                 x: data.player.startX,
                 y: data.player.startY,
@@ -105,6 +233,33 @@ function loadLevel(levelNum) {
             };
             gamePaused = false;
             runGameLoop();
+
+            // --- Level 5: Timed spike spawning logic ---
+            if (levelNum === 5) {
+                // Only spawn spikes if not already present
+                let spikeStep = 0;
+                const stepPlatforms = platforms.slice(0, 10); // 10 steps
+                setTimeout(() => {
+                    const spikeInterval = setInterval(() => {
+                        if (spikeStep >= stepPlatforms.length) {
+                            clearInterval(spikeInterval);
+                            return;
+                        }
+                        const p = stepPlatforms[spikeStep];
+                        // Place spike in the center of the step
+                        traps.push({
+                            x: p.x + p.width / 2 - 20,
+                            y: p.y - 20,
+                            width: 40,
+                            height: 20,
+                            color: '#8B4513',
+                            type: 'spikes'
+                        });
+                        spikeStep++;
+                    }, 1000); //1 second between each spike
+                }, 5000); //seconds delay before spikes start appearing
+            }
+            // --- End Level 5 spike logic ---
         })
         .catch(err => {
             console.error("Failed to load level:", err);
@@ -160,6 +315,19 @@ function runGameLoop() {
 
 // Update game state
 function update() {
+    // --- Level 7: Trigger spike after player moves ---
+    if (currentLevel === 7 && !level7SpikeTimerStarted) {
+        if (player.dx !== 0 || player.dy !== 0) {
+            // Find the spike trap with appearAfterMove
+            const spike = traps.find(t => t.appearAfterMove && t.hidden);
+            if (spike) {
+                level7SpikeTimerStarted = true;
+                level7SpikeTimeout = setTimeout(() => {
+                    spike.hidden = false;
+                }, spike.movement && spike.movement.triggerDelay ? spike.movement.triggerDelay : 2500);
+            }
+        }
+    }
     if (gamePaused) return;
     if (keys['ArrowLeft']) player.dx = -3;
     else if (keys['ArrowRight']) player.dx = 3;
@@ -191,21 +359,35 @@ function update() {
             }
         });
 
+        // Platform collision: Only allow landing on top, not jumping through from below
+        if (!overHole &&
+            player.x < p.x + p.width &&
+            player.x + player.width > p.x &&
+            player.y + player.height > p.y &&
+            player.y + player.height - player.dy <= p.y &&
+            player.dy > 0) {
+            // Land on top
+            player.y = p.y - player.height;
+            player.dy = 0;
+            player.onGround = true;
+        }
+        // Prevent jumping through from below
+        // If player's head is colliding with platform bottom while moving up
         if (!overHole &&
             player.x < p.x + p.width &&
             player.x + player.width > p.x &&
             player.y < p.y + p.height &&
-            player.y + player.height > p.y) {
-            if (player.dy > 0) {
-                player.y = p.y - player.height;
-                player.dy = 0;
-                player.onGround = true;
-            }
+            player.y > p.y &&
+            player.dy < 0) {
+            // Hit head on platform
+            player.y = p.y + p.height;
+            player.dy = 0;
         }
     });
 
     // Trap collision (player dies)
     traps.forEach(t => {
+        if (t.hidden) return; // Skip hidden traps (for level 7 spike)
         if (
             (t.type === "moving_hole" &&
                 player.x + player.width > t.x &&
@@ -233,8 +415,18 @@ function update() {
         if (t.type === "moving_hole" && Math.abs(player.x - t.x) < t.movement.triggerDistance) {
             t.x -= t.movement.speed;
         }
-        if (t.type === "moving_spikes" && Math.abs(player.x - t.x) < t.movement.triggerDistance) {
-            t.x += t.movement.direction === "left" ? -t.movement.speed : t.movement.speed;
+        if (t.type === "moving_spikes") {
+            // For level 7, only move if not hidden
+            if (t.hidden) return;
+            // If triggerDistance is set, only move if player is close
+            if (t.movement && t.movement.triggerDistance) {
+                if (Math.abs(player.x - t.x) < t.movement.triggerDistance) {
+                    t.x += t.movement.direction === "left" ? -t.movement.speed : t.movement.speed;
+                }
+            } else {
+                // For level 7, just move every frame once revealed
+                t.x += t.movement.direction === "left" ? -t.movement.speed : t.movement.speed;
+            }
         }
     });
 
@@ -320,7 +512,17 @@ canvas.addEventListener('click', function(e) {
 let soundEnabled = true;
 
 function playSound(sound) {
-    if (soundEnabled) sound.play();
+    if (!soundEnabled) return;
+    // Always reset to start for short SFX
+    sound.currentTime = 0;
+    sound.play();
+}
+
+function stopAllSounds() {
+    [jumpSound, trapSound, winSound].forEach(snd => {
+        snd.pause();
+        snd.currentTime = 0;
+    });
 }
 
 // Draw the player as a stick figure with running animation
@@ -413,6 +615,7 @@ function draw() {
 
     // Draw traps
     traps.forEach(t => {
+        if (t.hidden) return; // Don't draw hidden traps (for level 7 spike)
         if (t.type === "spikes" || t.type === "moving_spikes") {
             // Draw spikes as triangles
             ctx.fillStyle = t.color || '#8B4513'; // Spike color
@@ -596,6 +799,17 @@ function createWinModal() {
 // Input handling
 document.addEventListener('keydown', e => {
     keys[e.code] = true;
+    // If RESET popup is shown, only allow reset actions
+    if (showResetPopup) {
+        if (e.code === 'Enter' || e.code === 'Space') {
+            const resetBtn = document.getElementById('resetBtn');
+            if (resetBtn) {
+                resetBtn.click();
+            }
+        }
+        // Prevent all other actions while reset popup is visible
+        return;
+    }
     if (playerDead && showRestartMessage) {
         playerDead = false;
         showRestartMessage = false;
@@ -615,10 +829,6 @@ document.addEventListener('keydown', e => {
             keys = {};
             canMove = true;
         }, 1000);
-        return;
-    }
-    if (showResetPopup) {
-        // Do nothing, wait for RESET button
         return;
     }
     if (e.code === 'Enter' && gamePaused) {
@@ -648,16 +858,51 @@ const instructionsText = {
     es: "Usa las flechas o la barra espaciadora para moverte y saltar. Evita las trampas y alcanza la meta. ¡Espera lo inesperado!"
 };
 
+const startButtonText = {
+    en: "Press Enter or Tap to Start the Game",
+    uk: "Натисніть Enter або торкніться, щоб почати гру",
+    es: "Presiona Enter o toca para comenzar el juego"
+};
+
 // All button event listeners inside DOMContentLoaded
+
 document.addEventListener('DOMContentLoaded', () => {
-    // Start button
-    const startButton = document.querySelector('.start-button');
-    if (startButton) {
-        startButton.addEventListener('click', () => {
-            startGame(1); // Explicitly start with level 1
-            //startGame(getSavedLevel());
+    // Level select menu logic
+
+    const levelSelect = document.getElementById('levelSelect');
+    const mainStartButton = document.getElementById('mainStartButton');
+    const startMenuContainer = document.getElementById('startMenuContainer');
+    const maxLevel = 10; // Now supporting 10 levels
+    function getUnlockedLevel() {
+        const saved = localStorage.getItem('trustIssuesLevel');
+        return saved ? Math.max(1, parseInt(saved)) : 1;
+    }
+    function renderLevelButtons() {
+        if (!levelSelect) return;
+        levelSelect.innerHTML = '';
+        const unlocked = getUnlockedLevel();
+        for (let i = 1; i <= maxLevel; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'level-btn';
+            btn.textContent = i;
+            btn.disabled = i > unlocked;
+            btn.title = btn.disabled ? 'Locked' : `Go to Level ${i}`;
+            btn.addEventListener('click', () => {
+                startGame(i);
+            });
+            levelSelect.appendChild(btn);
+        }
+    }
+    renderLevelButtons();
+
+    // Start button (main)
+    if (mainStartButton) {
+        mainStartButton.addEventListener('click', () => {
+            startGame(getUnlockedLevel());
         });
     }
+
+    // ...existing code...
 
     // Sound toggle
     const soundToggle = document.getElementById('soundToggle');
@@ -666,6 +911,9 @@ document.addEventListener('DOMContentLoaded', () => {
         soundToggle.addEventListener('click', () => {
             soundEnabled = !soundEnabled;
             soundIcon.textContent = soundEnabled ? 'volume_up' : 'volume_off';
+            if (!soundEnabled) {
+                stopAllSounds();
+            }
         });
     }
 
@@ -685,6 +933,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const instructions = document.querySelector('.instructions-centered p');
             instructions.textContent = instructionsText[lang] || instructionsText['en'];
             languageMenu.classList.remove('show');
+
+            // Change Start button text
+            const startButton = document.querySelector('.start-button');
+            if (startButton) {
+                startButton.textContent = startButtonText[lang] || startButtonText['en'];
+            }
         });
     });
 

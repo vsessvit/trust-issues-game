@@ -1,3 +1,42 @@
+.level-select {
+    margin-top: 280px;
+    margin-bottom: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.level-btn {
+    background: #8B4513;
+    color: #F5F5DC;
+    border: 2px solid #ED6509;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    padding: 7px 14px;
+    min-width: 44px;
+    min-height: 38px;
+    cursor: pointer;
+    box-shadow: 0 0 6px #ED701C;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    margin: 0;
+}
+.level-btn:hover:not(:disabled) {
+    background: #ED6509;
+    color: #fff;
+    box-shadow: 0 0 12px #FF8C00;
+}
+.level-btn:disabled {
+    background: #312f2e;
+    color: #aaa;
+    border: 2px solid #444;
+    cursor: not-allowed;
+    box-shadow: none;
+    opacity: 0.7;
+}
 body {
     margin: 0;
     padding: 0;
@@ -81,6 +120,23 @@ body {
     transform: translate(-50%, -50%);
     z-index: 10;
     text-align: center;
+}
+
+.level-select {
+    position: absolute;
+    top: calc(55% + 70px);
+    left: 50%;
+    transform: translate(-50%, 0);
+    margin-top: 0;
+    margin-bottom: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+    z-index: 10;
 }
 
 .start-button {

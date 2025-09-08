@@ -1,0 +1,19 @@
+{
+    "level": 6,
+    "player": {"startX": 50, "startY": 400, "width": 30, "height": 50, "color": "#000000"},
+    "platforms": [
+        {"x": 0, "y": 450, "width": 910, "height": 50, "color": "#F4A460"},
+    {"x": 200, "y": 350, "width": 120, "height": 20, "color": "#F4A460"},
+    {"x": 340, "y": 290, "width": 120, "height": 20, "color": "#F4A460"},
+    {"x": 480, "y": 230, "width": 120, "height": 20, "color": "#F4A460"},
+    {"x": 620, "y": 180, "width": 120, "height": 20, "color": "#F4A460"}
+    ],
+    "traps": [
+        {"x": 250, "y": 430, "width": 40, "height": 20, "color": "#8B4513", "type": "spikes"},
+    {"x": 520, "y": 210, "width": 40, "height": 20, "color": "#8B4513", "type": "moving_spikes", "movement": {"triggerDistance": 100, "direction": "left", "speed": 3}},
+    {"x": 700, "y": 160, "width": 40, "height": 20, "color": "#8B4513", "type": "spikes"}
+    ],
+    "goal": {"x": 800, "y": 130, "width": 40, "height": 50, "color": "#C0C0C0"},
+    "background": {"color": "#8B4513"},
+    "sound": {"jump": "assets/sounds/jump.wav", "trap": "assets/sounds/trap.wav", "win": "assets/sounds/win.wav"}
+}

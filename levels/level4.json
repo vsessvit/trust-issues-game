@@ -1,0 +1,41 @@
+{
+    "level": 4,
+    "player": {
+        "startX": 30,
+        "startY": 480,
+        "width": 30,
+        "height": 50,
+        "color": "#000000"
+    },
+    "platforms": [
+        { "x": 0, "y": 530, "width": 910, "height": 20, "color": "#F4A460" },
+        { "x": 0, "y": 450, "width": 180, "height": 20, "color": "#F4A460" },
+        { "x": 250, "y": 400, "width": 180, "height": 20, "color": "#F4A460" },
+        { "x": 500, "y": 350, "width": 180, "height": 20, "color": "#F4A460" },
+        { "x": 750, "y": 300, "width": 120, "height": 20, "color": "#F4A460" },
+        { "x": 400, "y": 200, "width": 200, "height": 20, "color": "#F4A460" },
+        { "x": 800, "y": 100, "width": 80, "height": 20, "color": "#F4A460" }
+    ],
+    "traps": [
+        { "x": 120, "y": 450, "width": 60, "height": 20, "color": "#8B4513", "type": "moving_hole", "movement": { "direction": "left", "triggerDistance": 80, "speed": 2 } },
+        { "x": 320, "y": 400, "width": 40, "height": 20, "color": "#8B4513", "type": "spikes" },
+        { "x": 600, "y": 350, "width": 40, "height": 20, "color": "#8B4513", "type": "moving_spikes", "movement": { "triggerDistance": 100, "direction": "right", "speed": 3 } },
+        { "x": 780, "y": 300, "width": 40, "height": 20, "color": "#8B4513", "type": "spikes" },
+        { "x": 500, "y": 200, "width": 40, "height": 20, "color": "#8B4513", "type": "moving_spikes", "movement": { "triggerDistance": 60, "direction": "left", "speed": 2 } }
+    ],
+    "goal": {
+    "x": 830,
+    "y": 120,
+    "width": 40,
+    "height": 50,
+    "color": "#C0C0C0"
+    },
+    "background": {
+        "color": "#3B2F2F"
+    },
+    "sound": {
+        "jump": "assets/sounds/jump.wav",
+        "trap": "assets/sounds/trap.wav",
+        "win": "assets/sounds/win.wav"
+    }
+}
