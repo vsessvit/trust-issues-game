@@ -1,3 +1,91 @@
+/* Large screens: match laptop layout exactly */
+@media (min-width: 1400px) {
+    .instructions-centered {
+        font-size: 2.1rem !important;
+        padding: 2.5rem 3.5rem !important;
+        border-radius: 18px !important;
+        max-width: 1200px !important;
+    }
+    .start-button {
+        font-size: 2.1rem !important;
+        padding: 1.5rem 3.5rem !important;
+        border-radius: 18px !important;
+        min-width: 320px !important;
+        min-height: 80px !important;
+    }
+    .level-select {
+        gap: 24px !important;
+        max-width: 900px !important;
+    }
+    .level-btn {
+        font-size: 1.6rem !important;
+        padding: 18px 36px !important;
+        min-width: 90px !important;
+        min-height: 70px !important;
+        border-radius: 14px !important;
+    }
+    .left-controls {
+        position: fixed !important;
+        top: auto !important;
+        bottom: 100px !important; /* move buttons here*/
+        left: 20px !important;
+        transform: none !important;
+        flex-direction: column !important;
+        gap: 18px !important;
+        z-index: 100 !important;
+    }
+    .left-controls button {
+        width: 200px !important;
+        height: 60px !important;
+        font-size: 1.3rem !important;
+        padding: 16px 24px !important;
+    }
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        max-width: 100vw;
+        width: 100vw;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 0;
+        padding-right: 0;
+    }
+    body {
+        justify-content: flex-start;
+        align-items: center;
+    }
+    .game-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100vw;
+        height: 100vh;
+    }
+    canvas#gameCanvas {
+        display: block;
+        margin: 40px auto 0 auto;
+        width: 910px;
+        height: 550px;
+        max-width: 910px;
+        max-height: 550px;
+        aspect-ratio: unset;
+        box-sizing: border-box;
+    }
+    #hud {
+        width: 910px;
+        max-width: 910px;
+        margin: 10px auto;
+    }
+    /* Removed duplicate/conflicting .left-controls rules */
+    footer {
+        width: 100vw;
+        max-width: 100vw;
+    }
+}
+
 .level-select {
     margin-top: 280px;
     margin-bottom: 0;
@@ -495,4 +583,13 @@ body.portrait-mode::before {
 .pause-btn#resetBtn {
     background: #ED6509;
     color: #F5F5DC;
+}
+
+.container {
+    max-width: 100vw;
+    width: 100vw;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
 }
