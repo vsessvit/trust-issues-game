@@ -77,10 +77,16 @@ function actuallyStartGame(levelNum) {
     
     if (isMobile) {
         if (leftControls) leftControls.classList.add('hide-on-mobile-game');
-        if (onscreenControls) onscreenControls.classList.add('active');
+        if (onscreenControls) {
+            onscreenControls.classList.add('active');
+            onscreenControls.style.display = 'flex';
+        }
     } else {
         if (leftControls) leftControls.classList.remove('hide-on-mobile-game');
-        if (onscreenControls) onscreenControls.classList.remove('active');
+        if (onscreenControls) {
+            onscreenControls.classList.remove('active');
+            onscreenControls.style.display = 'none';
+        }
     }
 // Show a victory animation and play happy music after level 10
 function showVictoryAnimation() {
@@ -908,6 +914,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const initialOnscreenControls = document.querySelector('.onscreen-controls');
     if (initialOnscreenControls) {
         initialOnscreenControls.classList.remove('active');
+        initialOnscreenControls.style.display = 'none';
     }
     
     // Level select menu logic

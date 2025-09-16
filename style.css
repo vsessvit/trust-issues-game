@@ -378,7 +378,7 @@ footer {
 /* MOBILE/TABLET RESPONSIVE LAYOUT */
 @media (max-width: 900px) {
     body {
-        background-image: url('assets/images/HomepageBackgroundMobile.JPG');
+        background-image: url('assets/images/HomepageBackgroundMobile.jpg');
         background-size: cover !important;
         background-position: top center !important;
         background-color: #1a120a !important;
