@@ -55,6 +55,33 @@ function getSavedLevel() {
 // Start game logic
 function startGame(levelNum) {
     console.log(`Starting game at level: ${levelNum}`);
+    
+    // Start game directly for all devices (desktop and mobile)
+    actuallyStartGame(levelNum);
+}
+
+// Legacy rotate overlay function - no longer needed as we support both orientations
+function showRotateOverlayForGameStart(levelNum) {
+    // This function is deprecated - we now support both orientations
+    actuallyStartGame(levelNum);
+}
+
+// Actually start the game (after overlay is dismissed or on desktop)
+function actuallyStartGame(levelNum) {
+    console.log(`Actually starting game at level: ${levelNum}`);
+    
+    // --- MOBILE/TABLET CONTROL VISIBILITY ---
+    const leftControls = document.querySelector('.left-controls');
+    const onscreenControls = document.querySelector('.onscreen-controls');
+    const isMobile = window.innerWidth <= 900;
+    
+    if (isMobile) {
+        if (leftControls) leftControls.classList.add('hide-on-mobile-game');
+        if (onscreenControls) onscreenControls.classList.add('active');
+    } else {
+        if (leftControls) leftControls.classList.remove('hide-on-mobile-game');
+        if (onscreenControls) onscreenControls.classList.remove('active');
+    }
 // Show a victory animation and play happy music after level 10
 function showVictoryAnimation() {
     stopAllSounds();
@@ -165,6 +192,7 @@ function drawConfetti(canvas) {
     }
     draw();
 }
+    
     // Hide the start screen
     const startScreen = document.getElementById('start-screen');
     if (startScreen) {
@@ -187,6 +215,13 @@ function drawConfetti(canvas) {
     }
     // Show the game canvas
     canvas.style.display = 'block';
+    
+    // Add game-active class to show black background
+    const gameContainer = document.querySelector('.game-container');
+    if (gameContainer) {
+        gameContainer.classList.add('game-active');
+    }
+    
     lives = 5;
     // Load the specified level
     loadLevel(levelNum);
@@ -839,8 +874,10 @@ document.addEventListener('keyup', e => {
     keys[e.code] = false;
 });
 
-// Orientation check
+// Orientation check - now supports both orientations
 function checkOrientation() {
+    // Game now works in both portrait and landscape modes
+    // CSS media queries handle the responsive layout
     if (window.innerHeight > window.innerWidth) {
         document.body.classList.add('portrait-mode');
     } else {
@@ -867,8 +904,13 @@ const startButtonText = {
 // All button event listeners inside DOMContentLoaded
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Ensure onscreen controls are hidden on page load
+    const initialOnscreenControls = document.querySelector('.onscreen-controls');
+    if (initialOnscreenControls) {
+        initialOnscreenControls.classList.remove('active');
+    }
+    
     // Level select menu logic
-
     const levelSelect = document.getElementById('levelSelect');
     const mainStartButton = document.getElementById('mainStartButton');
     const startMenuContainer = document.getElementById('startMenuContainer');
@@ -902,7 +944,56 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ...existing code...
+    // --- On-screen controls for mobile/tablet ---
+    const onscreenControls = document.querySelector('.onscreen-controls');
+    const btnLeft = document.getElementById('btnLeft');
+    const btnRight = document.getElementById('btnRight');
+    const btnJump = document.getElementById('btnJump');
+    const btnPause = document.getElementById('btnPause');
+    
+    // Helper to trigger key events for game logic
+    function triggerKey(code, pressed) {
+        keys[code] = pressed;
+    }
+    
+    if (btnLeft && btnRight && btnJump) {
+        // Touch events for left
+        btnLeft.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('ArrowLeft', true); });
+        btnLeft.addEventListener('touchend', e => { e.preventDefault(); triggerKey('ArrowLeft', false); });
+        // Touch events for right
+        btnRight.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('ArrowRight', true); });
+        btnRight.addEventListener('touchend', e => { e.preventDefault(); triggerKey('ArrowRight', false); });
+        // Touch events for jump (space)
+        btnJump.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('Space', true); });
+        btnJump.addEventListener('touchend', e => { e.preventDefault(); triggerKey('Space', false); });
+        // Mouse fallback for desktop testing
+        btnLeft.addEventListener('mousedown', e => { e.preventDefault(); triggerKey('ArrowLeft', true); });
+        btnLeft.addEventListener('mouseup', e => { e.preventDefault(); triggerKey('ArrowLeft', false); });
+        btnRight.addEventListener('mousedown', e => { e.preventDefault(); triggerKey('ArrowRight', true); });
+        btnRight.addEventListener('mouseup', e => { e.preventDefault(); triggerKey('ArrowRight', false); });
+        btnJump.addEventListener('mousedown', e => { e.preventDefault(); triggerKey('Space', true); });
+        btnJump.addEventListener('mouseup', e => { e.preventDefault(); triggerKey('Space', false); });
+    }
+    
+    // Pause button for mobile
+    if (btnPause) {
+        btnPause.addEventListener('touchstart', e => { 
+            e.preventDefault(); 
+            e.stopPropagation();
+            console.log('Pause button touched');
+            gamePaused = true;
+            showPausePopup();
+        });
+        btnPause.addEventListener('click', e => { 
+            e.preventDefault(); 
+            e.stopPropagation();
+            console.log('Pause button clicked');
+            gamePaused = true;
+            showPausePopup();
+        });
+    } else {
+        console.log('btnPause element not found');
+    }
 
     // Sound toggle
     const soundToggle = document.getElementById('soundToggle');
@@ -982,12 +1073,55 @@ document.addEventListener('DOMContentLoaded', () => {
         playBtn.addEventListener('click', function() {
             pausePopup.classList.add('hidden');
             gamePaused = false; // Resumes the game
+            
+            // Restore mobile controls when resuming
+            const isMobile = window.innerWidth <= 900;
+            const leftControls = document.querySelector('.left-controls');
+            const onscreenControls = document.querySelector('.onscreen-controls');
+            
+            if (isMobile) {
+                if (leftControls) leftControls.classList.add('hide-on-mobile-game');
+                if (onscreenControls) onscreenControls.classList.add('active');
+            }
         });
     }
 });
 
-// On game start
-//loadLevel(currentLevel);
+
+// --- Ensure controls update on pause/game end ---
+function showPausePopup() {
+    console.log('showPausePopup called');
+    const leftControls = document.querySelector('.left-controls');
+    const onscreenControls = document.querySelector('.onscreen-controls');
+    const pausePopup = document.getElementById('pausePopup');
+    
+    console.log('pausePopup element:', pausePopup);
+    
+    // Show pause popup
+    if (pausePopup) {
+        pausePopup.classList.remove('hidden');
+        console.log('Removed hidden class from pause popup');
+    } else {
+        console.log('pausePopup element not found!');
+    }
+    
+    // Keep mobile controls visible but make pause popup accessible
+    if (window.innerWidth <= 900) {
+        if (leftControls) leftControls.classList.add('hide-on-mobile-game');
+        if (onscreenControls) onscreenControls.classList.remove('active');
+    } else {
+        if (leftControls) leftControls.classList.remove('hide-on-mobile-game');
+        if (onscreenControls) onscreenControls.classList.remove('active');
+    }
+}
+
+// Patch pause button click to use showPausePopup
+document.addEventListener('DOMContentLoaded', () => {
+    const pausePopup = document.getElementById('pausePopup');
+    if (pausePopup) {
+        pausePopup.addEventListener('show', showPausePopup);
+    }
+});
 
 function transitionToNextLevel(callback) {
     const overlay = document.createElement('div');

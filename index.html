@@ -1,12 +1,14 @@
+  
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trust Issues</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trust Issues</title>
+    <link rel="icon" type="image/png" href="assets/images/favicon.png">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body class="bg-dark text-light">
     
@@ -19,6 +21,13 @@
             <div id="level-indicator">Level: 1</div>
             <div id="timer">Time: 00:00</div>
         </div> -->
+          <!-- Rotate device overlay for mobile/tablet -->
+        <div id="rotateOverlay" class="rotate-overlay hidden">
+          <div class="rotate-message-box">
+            <div class="rotate-message-text">For the best experience, please rotate your device.</div>
+            <button id="gotItBtn" class="onscreen-btn" style="margin-top:24px;min-width:120px;">Got it</button>
+          </div>
+        </div>
 
 
         <div class="start-button-container" id="startMenuContainer">
@@ -45,8 +54,19 @@
 
 
         <div class="game-container text-center">
-            <canvas id="gameCanvas" width="800" height="600"></canvas>
+      <canvas id="gameCanvas" width="800" height="600"></canvas>
+      <!-- On-screen controls for mobile/tablet -->
+      <div class="onscreen-controls">
+        <div class="onscreen-left-group">
+          <button class="onscreen-btn" id="btnLeft" aria-label="Move Left">&#8592;</button>
+          <button class="onscreen-btn" id="btnRight" aria-label="Move Right">&#8594;</button>
         </div>
+        <div class="onscreen-right-group">
+          <button class="onscreen-btn" id="btnJump" aria-label="Jump">&#8679;</button>
+          <button class="onscreen-btn" id="btnPause" aria-label="Pause">&#10074;&#10074;</button>
+        </div>
+      </div>
+    </div>
     </div>
 
     <!-- Modal for messages -->
