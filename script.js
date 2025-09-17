@@ -527,10 +527,22 @@ if (debugToggle) {
     });
 }
 
-canvas.addEventListener('click', function(e) {
+function handleCanvasTouch(e) {
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    let clientX, clientY;
+    
+    if (e.touches && e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+    } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+    }
+    
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
 
     // Pause button area
     const pauseBtnX = canvas.width - 60;
@@ -542,13 +554,14 @@ canvas.addEventListener('click', function(e) {
         x >= pauseBtnX && x <= pauseBtnX + pauseBtnW &&
         y >= pauseBtnY && y <= pauseBtnY + pauseBtnH
     ) {
+        e.preventDefault();
         gamePaused = true;
-        const pausePopup = document.getElementById('pausePopup');
-        if (pausePopup) {
-            pausePopup.classList.remove('hidden');
-        }
+        showPausePopup();
     }
-});
+}
+
+canvas.addEventListener('click', handleCanvasTouch);
+canvas.addEventListener('touchstart', handleCanvasTouch);
 
 let soundEnabled = true;
 
@@ -735,7 +748,7 @@ function draw() {
             ctx.font = 'bold 40px Arial';
             ctx.fillStyle = '#F5F5DC';
             ctx.textAlign = 'center';
-            ctx.fillText('Press any key', canvas.width / 2, 100);
+            ctx.fillText('Tap or press any key', canvas.width / 2, 100);
             ctx.restore();
         }
     } else if (respawnAnimation) {
@@ -910,12 +923,20 @@ const startButtonText = {
 // All button event listeners inside DOMContentLoaded
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Ensure onscreen controls are hidden on page load
+    // Ensure onscreen controls are hidden on page load for phones
     const initialOnscreenControls = document.querySelector('.onscreen-controls');
     if (initialOnscreenControls) {
         initialOnscreenControls.classList.remove('active');
         initialOnscreenControls.style.display = 'none';
     }
+    // Always remove 'active' from onscreen-controls and set display to none on page load
+    setTimeout(() => {
+        const controls = document.querySelector('.onscreen-controls');
+        if (controls) {
+            controls.classList.remove('active');
+            controls.style.display = 'none';
+        }
+    }, 0);
     
     // Level select menu logic
     const levelSelect = document.getElementById('levelSelect');
@@ -1322,3 +1343,27 @@ function drawRespawnAnimation(ctx, player) {
         deathPieces = [];
     }
 }
+
+// Restart level on canvas tap/click if dead
+function handleCanvasRestart(e) {
+    if (playerDead && showRestartMessage && lives > 0) {
+        e.preventDefault();
+        playerDead = false;
+        showRestartMessage = false;
+        explosionTimer = 0;
+        respawnAnimation = true;
+        movementLocked = true;
+        canMove = false;
+        loadLevel(currentLevel);
+        setTimeout(() => {
+            respawnAnimation = false;
+            movementLocked = false;
+            player.dx = 0;
+            player.dy = 0;
+            keys = {};
+            canMove = true;
+        }, 1000);
+    }
+}
+canvas.addEventListener('click', handleCanvasRestart);
+canvas.addEventListener('touchstart', handleCanvasRestart);
