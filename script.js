@@ -561,7 +561,7 @@ function handleCanvasTouch(e) {
 }
 
 canvas.addEventListener('click', handleCanvasTouch);
-canvas.addEventListener('touchstart', handleCanvasTouch);
+canvas.addEventListener('touchstart', handleCanvasTouch, { passive: true });
 
 let soundEnabled = true;
 
@@ -1366,4 +1366,4 @@ function handleCanvasRestart(e) {
     }
 }
 canvas.addEventListener('click', handleCanvasRestart);
-canvas.addEventListener('touchstart', handleCanvasRestart);
+canvas.addEventListener('touchstart', handleCanvasRestart, { passive: true });
