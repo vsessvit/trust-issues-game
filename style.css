@@ -22,20 +22,43 @@
     }
     /* Volume and settings buttons smaller, above footer, hidden during gameplay */
     .left-controls {
-        position: fixed !important;
-        left: 50% !important;
-        bottom: 120px !important;
-        top: auto !important;
-        transform: translateX(-50%) !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 60px !important;
+        bottom: auto !important;
+        transform: none !important;
         flex-direction: row !important;
-        gap: 16px !important;
+        gap: 0 !important;
         z-index: 120 !important;
-        width: auto !important;
+        width: 100vw !important;
         height: auto !important;
+        justify-content: space-between !important;
+        pointer-events: auto !important;
+    }
+    #soundToggle {
+        margin-left: 12px !important;
+    }
+    #settingsBtn {
+        margin-right: 12px !important;
+    }
+    .level-select {
+        position: absolute;
+        top: 60px;
+        left: 50%;
+        transform: translateX(-50%);
+        margin-top: 0;
+        margin-bottom: 0;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        max-width: 260px;
+        min-width: 260px;
+        z-index: 121;
     }
     .left-controls button {
-        width: 50px;
-        height: 18px;
+        width: 45px;
+        height: 36px;
         font-size: 0.95rem;
         padding: 6px 10px;
         border-radius: 8px;
@@ -538,13 +561,6 @@ footer {
     padding: 0.5rem;
     font-size: 0.9rem;
     z-index: 10;
-}
-
-/* Hide footer for mobile landscape */
-@media (max-width: 900px) and (orientation: landscape) {
-    footer {
-        display: none !important;
-    }
 }
 
 /* Ensure onscreen controls are hidden by default on all screen sizes */
