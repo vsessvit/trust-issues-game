@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Trust Issues</title>
     <link rel="icon" type="image/png" href="assets/images/favicon.png">
   <link rel="stylesheet" href="style.css">
@@ -55,6 +55,17 @@
 
         <div class="game-container text-center">
       <canvas id="gameCanvas" width="800" height="600"></canvas>
+      
+      <!-- Onscreen controls for mobile/tablet -->
+      <div class="onscreen-controls">
+          <div class="onscreen-left-group">
+              <button id="btnLeft" class="onscreen-btn">←</button>
+              <button id="btnRight" class="onscreen-btn">→</button>
+          </div>
+          <div class="onscreen-right-group">
+              <button id="btnJump" class="onscreen-btn">↑</button>
+          </div>
+      </div>
     </div>
     </div>
 

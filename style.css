@@ -303,9 +303,6 @@
         font-size: 1.3rem;
         padding: 16px 24px;
     }
-    footer {
-        display: none !important;
-    }
 }
 
 .level-select {
@@ -372,6 +369,11 @@ html {
 
 /* TABLET PORTRAIT ORIENTATION SETTINGS */
 @media (min-width: 601px) and (max-width: 1200px) and (orientation: portrait) {
+    html {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        overflow-x: hidden !important;
+    }
     /* On-screen controls hidden by default, visible when active */
     body .onscreen-controls {
         display: none !important;
@@ -383,14 +385,22 @@ html {
         opacity: 1 !important;
         pointer-events: auto !important;
     }
-    body {
-        background-image: url('assets/images/HomepageBackgroundMobile.JPG');
-        background-size: cover !important;
-        background-position: top center !important;
-        background-color: #1a120a !important;
+    html, body {
         width: 100vw !important;
-        min-height: 100vh !important;
+        max-width: 100vw !important;
         overflow-x: hidden !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    body {
+        background-image: url('assets/images/HomepageBackgroundMobile.jpg');
+        background-size: 100% 100% !important;
+        background-position: center !important;
+        background-repeat: no-repeat !important;
+        background-attachment: fixed !important;
+        background-color: #1a120a !important;
+        min-height: 100vh !important;
         overflow-y: auto !important;
     }
     
@@ -461,6 +471,7 @@ html {
         position: relative;
         overflow: visible;
         padding: 0;
+        margin-top: 60px; /* Offset for title */
     }
     
     canvas#gameCanvas {
@@ -478,13 +489,14 @@ html {
         position: relative;
         z-index: 100;
         margin: 0 auto;
+        overflow: hidden;
     }
 
     /* Position onscreen controls below game canvas */
     body .onscreen-controls {
         position: absolute;
         left: 50%;
-        top: calc(50% + 250px); /* move lower */
+        top: calc(50% + 320px); /* moved 70px lower */
         transform: translateX(-50%);
         width: 70vw;
         max-width: 600px;
@@ -561,10 +573,11 @@ html {
     }
     body {
         background-image: url('assets/images/HomepageBackgroundMobile.JPG');
-        background-size: cover !important;
-        background-position: top center !important;
+        background-size: 100% 100% !important;
+        background-position: center !important;
+        background-repeat: no-repeat !important;
+        background-attachment: fixed !important;
         background-color: #1a120a !important;
-        width: 100vw !important;
         min-height: 100vh !important;
         overflow-x: hidden !important;
         overflow-y: hidden !important;
@@ -667,15 +680,16 @@ html {
         position: relative;
         overflow: hidden;
         padding: 0;
+        margin-top: 60px; /* Offset for title */
     }
     
     canvas#gameCanvas {
         display: block;
         margin: 0 auto;
-        width: 65vw;
-        height: calc(65vw * 550 / 910);
-        max-width: 520px;
-        max-height: 300px;
+        width: 70vw;
+        height: calc(70vw * 550 / 910);
+        max-width: 600px;
+        max-height: 360px;
         aspect-ratio: 910 / 550;
         background: #000;
         box-sizing: border-box;
@@ -684,6 +698,7 @@ html {
         border-radius: 8px;
         position: relative;
         z-index: 100;
+        overflow: hidden;
     }
 
     /* Position onscreen controls below game canvas */
@@ -743,9 +758,14 @@ html {
         transform: scale(0.95);
     }
 
-    /* Hide footer for tablet landscape */
+    /* Show footer for tablet landscape */
     footer {
-        display: none !important;
+        display: block !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100vw;
+        z-index: 100;
     }
 }
 
@@ -965,27 +985,20 @@ footer {
 }
 
 /* Ensure onscreen controls are hidden by default on all screen sizes */
-.onscreen-controls {
-    display: none !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-}
-
-.onscreen-controls.active {
-    display: flex !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-}
-
-/* MOBILE/TABLET RESPONSIVE LAYOUT */
-@media (max-width: 900px) {
-    body {
-        background-image: url('assets/images/HomepageBackgroundMobile.jpg');
-        background-size: cover !important;
-        background-position: top center !important;
-        background-color: #1a120a !important;
-        width: 100vw !important;
-        min-height: 100vh !important;
+    body .onscreen-controls {
+        position: absolute;
+        left: 50%;
+        top: calc(50% + 320px); /* match portrait offset */
+        transform: translateX(-50%);
+        width: 70vw;
+        max-width: 600px;
+        height: 100px;
+        background: none;
+        z-index: 101;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding: 20px 30px;
     }
     
     /* Game container - letterbox the canvas */
@@ -1148,14 +1161,8 @@ footer {
             z-index: 100;
         }
     }
-    
-    /* Landscape mode - hide footer */
-    @media (orientation: landscape) {
-        footer {
-            display: none !important;
-        }
-    }
-}
+
+/* End of tablet landscape media query */
 
 /* Rotate Device Overlay */
 .rotate-overlay {
