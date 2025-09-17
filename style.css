@@ -372,6 +372,17 @@ html {
 
 /* TABLET PORTRAIT ORIENTATION SETTINGS */
 @media (min-width: 601px) and (max-width: 1200px) and (orientation: portrait) {
+    /* On-screen controls hidden by default, visible when active */
+    body .onscreen-controls {
+        display: none !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+    body .onscreen-controls.active {
+        display: flex !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
     body {
         background-image: url('assets/images/HomepageBackgroundMobile.JPG');
         background-size: cover !important;
@@ -469,14 +480,11 @@ html {
         margin: 0 auto;
     }
 
-    /* On-screen controls below game canvas when level is open */
-    .onscreen-controls {
-        display: none !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
+    /* Position onscreen controls below game canvas */
+    body .onscreen-controls {
         position: absolute;
         left: 50%;
-        top: calc(50% + 200px);
+        top: calc(50% + 250px); /* move lower */
         transform: translateX(-50%);
         width: 70vw;
         max-width: 600px;
@@ -487,12 +495,6 @@ html {
         justify-content: space-between;
         align-items: flex-end;
         padding: 20px 30px;
-    }
-    
-    .onscreen-controls.active {
-        display: flex !important;
-        opacity: 1 !important;
-        pointer-events: auto !important;
     }
     
     .onscreen-left-group, .onscreen-right-group {
@@ -546,6 +548,17 @@ html {
 
 /* TABLET LANDSCAPE ORIENTATION SETTINGS */
 @media (min-width: 601px) and (max-width: 1200px) and (orientation: landscape) {
+    /* On-screen controls hidden by default, visible when active */
+    body .onscreen-controls {
+        display: none !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+    body .onscreen-controls.active {
+        display: flex !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
     body {
         background-image: url('assets/images/HomepageBackgroundMobile.JPG');
         background-size: cover !important;
@@ -673,11 +686,8 @@ html {
         z-index: 100;
     }
 
-    /* On-screen controls below game canvas when level is open */
-    .onscreen-controls {
-        display: none !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
+    /* Position onscreen controls below game canvas */
+    body .onscreen-controls {
         position: absolute;
         left: 50%;
         top: calc(50% + 180px);
@@ -691,12 +701,6 @@ html {
         justify-content: space-between;
         align-items: flex-end;
         padding: 20px 30px;
-    }
-    
-    .onscreen-controls.active {
-        display: flex !important;
-        opacity: 1 !important;
-        pointer-events: auto !important;
     }
     
     .onscreen-left-group, .onscreen-right-group {

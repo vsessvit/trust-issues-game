@@ -73,9 +73,9 @@ function actuallyStartGame(levelNum) {
     // --- MOBILE/TABLET CONTROL VISIBILITY ---
     const leftControls = document.querySelector('.left-controls');
     const onscreenControls = document.querySelector('.onscreen-controls');
-    const isMobile = window.innerWidth <= 900;
+    const isMobileOrTablet = window.innerWidth <= 1200; // Include tablets up to 1200px
     
-    if (isMobile) {
+    if (isMobileOrTablet) {
         if (leftControls) leftControls.classList.add('hide-on-mobile-game');
         if (onscreenControls) {
             onscreenControls.classList.add('active');
@@ -1102,12 +1102,12 @@ document.addEventListener('DOMContentLoaded', () => {
             pausePopup.classList.add('hidden');
             gamePaused = false; // Resumes the game
             
-            // Restore mobile controls when resuming
-            const isMobile = window.innerWidth <= 900;
+            // Restore mobile/tablet controls when resuming
+            const isMobileOrTablet = window.innerWidth <= 1200; // Include tablets up to 1200px
             const leftControls = document.querySelector('.left-controls');
             const onscreenControls = document.querySelector('.onscreen-controls');
             
-            if (isMobile) {
+            if (isMobileOrTablet) {
                 if (leftControls) leftControls.classList.add('hide-on-mobile-game');
                 if (onscreenControls) onscreenControls.classList.add('active');
             }
@@ -1133,8 +1133,8 @@ function showPausePopup() {
         console.log('pausePopup element not found!');
     }
     
-    // Keep mobile controls visible but make pause popup accessible
-    if (window.innerWidth <= 900) {
+    // Keep mobile/tablet controls visible but make pause popup accessible
+    if (window.innerWidth <= 1200) { // Include tablets up to 1200px
         if (leftControls) leftControls.classList.add('hide-on-mobile-game');
         if (onscreenControls) onscreenControls.classList.remove('active');
     } else {
