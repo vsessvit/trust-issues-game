@@ -985,15 +985,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     if (btnLeft && btnRight && btnJump) {
-        // Touch events for left
-        btnLeft.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('ArrowLeft', true); });
-        btnLeft.addEventListener('touchend', e => { e.preventDefault(); triggerKey('ArrowLeft', false); });
-        // Touch events for right
-        btnRight.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('ArrowRight', true); });
-        btnRight.addEventListener('touchend', e => { e.preventDefault(); triggerKey('ArrowRight', false); });
-        // Touch events for jump (space)
-        btnJump.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('Space', true); });
-        btnJump.addEventListener('touchend', e => { e.preventDefault(); triggerKey('Space', false); });
+    // Touch events for left
+    btnLeft.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('ArrowLeft', true); }, { passive: true });
+    btnLeft.addEventListener('touchend', e => { e.preventDefault(); triggerKey('ArrowLeft', false); }, { passive: true });
+    // Touch events for right
+    btnRight.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('ArrowRight', true); }, { passive: true });
+    btnRight.addEventListener('touchend', e => { e.preventDefault(); triggerKey('ArrowRight', false); }, { passive: true });
+    // Touch events for jump (space)
+    btnJump.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('Space', true); }, { passive: true });
+    btnJump.addEventListener('touchend', e => { e.preventDefault(); triggerKey('Space', false); }, { passive: true });
         // Mouse fallback for desktop testing
         btnLeft.addEventListener('mousedown', e => { e.preventDefault(); triggerKey('ArrowLeft', true); });
         btnLeft.addEventListener('mouseup', e => { e.preventDefault(); triggerKey('ArrowLeft', false); });

@@ -1,5 +1,9 @@
 /* PHONE LANDSCAPE ORIENTATION SETTINGS */
 @media (max-width: 900px) and (orientation: landscape) {
+    /* Hide left controls on mobile landscape home screen */
+    .left-controls {
+        display: none !important;
+    }
     html, body {
         width: 100vw !important;
         height: 100vh !important;
@@ -106,10 +110,10 @@
     }
     canvas#gameCanvas {
         display: block;
-        width: 90vw;
-        height: calc(90vw * 550 / 910);
-        max-width: 90vw;
-        max-height: 70vh;
+        width: 100vw;
+        height: calc(100vw * 550 / 910);
+        max-width: 100vw;
+        max-height: 55vh;
         aspect-ratio: 910 / 550;
         background: #000;
         box-sizing: border-box;
