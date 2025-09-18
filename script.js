@@ -73,19 +73,17 @@ function actuallyStartGame(levelNum) {
     // --- MOBILE/TABLET CONTROL VISIBILITY ---
     const leftControls = document.querySelector('.left-controls');
     const onscreenControls = document.querySelector('.onscreen-controls');
-    const isMobileOrTablet = window.innerWidth <= 1200; // Include tablets up to 1200px
+    const isMobileOrTablet = window.innerWidth <= 1400; // Include tablets up to 1200px
     
     if (isMobileOrTablet) {
         if (leftControls) leftControls.classList.add('hide-on-mobile-game');
         if (onscreenControls) {
             onscreenControls.classList.add('active');
-            onscreenControls.style.display = 'flex';
         }
     } else {
         if (leftControls) leftControls.classList.remove('hide-on-mobile-game');
         if (onscreenControls) {
             onscreenControls.classList.remove('active');
-            onscreenControls.style.display = 'none';
         }
     }
 // Show a victory animation and play happy music after level 10
@@ -350,7 +348,9 @@ function runGameLoop() {
     gameInterval = setInterval(() => {
         update();
         draw();
-        timer++;
+        if (!gamePaused) {
+            timer++;
+        }
     }, 1000 / 60);
 }
 
@@ -986,14 +986,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (btnLeft && btnRight && btnJump) {
     // Touch events for left
-    btnLeft.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('ArrowLeft', true); }, { passive: true });
-    btnLeft.addEventListener('touchend', e => { e.preventDefault(); triggerKey('ArrowLeft', false); }, { passive: true });
+    btnLeft.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('ArrowLeft', true); });
+    btnLeft.addEventListener('touchend', e => { e.preventDefault(); triggerKey('ArrowLeft', false); });
     // Touch events for right
-    btnRight.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('ArrowRight', true); }, { passive: true });
-    btnRight.addEventListener('touchend', e => { e.preventDefault(); triggerKey('ArrowRight', false); }, { passive: true });
+    btnRight.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('ArrowRight', true); });
+    btnRight.addEventListener('touchend', e => { e.preventDefault(); triggerKey('ArrowRight', false); });
     // Touch events for jump (space)
-    btnJump.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('Space', true); }, { passive: true });
-    btnJump.addEventListener('touchend', e => { e.preventDefault(); triggerKey('Space', false); }, { passive: true });
+    btnJump.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('Space', true); });
+    btnJump.addEventListener('touchend', e => { e.preventDefault(); triggerKey('Space', false); });
         // Mouse fallback for desktop testing
         btnLeft.addEventListener('mousedown', e => { e.preventDefault(); triggerKey('ArrowLeft', true); });
         btnLeft.addEventListener('mouseup', e => { e.preventDefault(); triggerKey('ArrowLeft', false); });
