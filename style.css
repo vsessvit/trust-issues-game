@@ -357,6 +357,7 @@ body {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    background-color: #000; /* fallback */
     min-height: 100vh;
     width: 100vw;
     max-width: 100vw;
@@ -401,10 +402,9 @@ html {
     
     body {
         background-image: url('assets/images/HomepageBackgroundMobile.jpg');
-        background-size: 100% 100% !important;
+        background-size: cover !important;
         background-position: center !important;
         background-repeat: no-repeat !important;
-        background-attachment: fixed !important;
         background-color: #1a120a !important;
         min-height: 100vh !important;
         overflow-y: auto !important;
@@ -585,9 +585,10 @@ html {
     body {
         background-image: url('assets/images/HomepageBackgroundMobile.jpg');
         background-size: cover !important;
-        background-position: top center !important;
+        background-position: center !important;
+        background-repeat: no-repeat !important;
         background-color: #1a120a !important; /* fallback color */
-         width: 100vw !important;
+        width: 100vw !important;
     }
     
     /* Mobile portrait specific adjustments */
@@ -1056,7 +1057,7 @@ footer {
 
 canvas#gameCanvas {
     display: none; /* Hidden until Start is pressed */
-    background-color: #000000;
+    background: transparent !important;
     border: 2px solid #F5F5DC;
     margin: 0; /* Remove auto margin to eliminate gaps */
     width: 100vw;
