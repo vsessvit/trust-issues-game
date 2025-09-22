@@ -352,7 +352,13 @@ function loadLevel(levelNum) {
 function onPlayerReachGoal() {
     gamePaused = true;
 
-    // Animate the door closing
+    // Check if this is level 10 - show winning animation instead
+    if (currentLevel === 10) {
+        showGameCompletionAnimation();
+        return;
+    }
+
+    // Animate the door closing (for levels 1-9)
     const goal = levelData.goal;
     const doorAnimationDuration = 1000; // 1 second
 
@@ -385,6 +391,127 @@ function onPlayerReachGoal() {
     }, doorAnimationDuration / 50); // Smooth animation (50 frames)
 }
 
+// Game completion animation for level 10
+function showGameCompletionAnimation() {
+    stopAllSounds();
+    if (soundEnabled) {
+        victoryMusic.currentTime = 0;
+        victoryMusic.play();
+    }
+    
+    // Get canvas position and size
+    const canvasRect = canvas.getBoundingClientRect();
+    
+    // Create overlay positioned over the game canvas
+    const overlay = document.createElement('div');
+    overlay.className = 'victory-overlay';
+    overlay.style.top = canvasRect.top + 'px';
+    overlay.style.left = canvasRect.left + 'px';
+    overlay.style.width = canvasRect.width + 'px';
+    overlay.style.height = canvasRect.height + 'px';
+    document.body.appendChild(overlay);
+    setTimeout(() => { overlay.classList.add('show'); }, 10);
+
+    // Add confetti canvas first (behind text)
+    const confettiCanvas = document.createElement('canvas');
+    confettiCanvas.className = 'victory-confetti';
+    confettiCanvas.width = canvasRect.width;
+    confettiCanvas.height = canvasRect.height;
+    overlay.appendChild(confettiCanvas);
+    drawWinConfetti(confettiCanvas);
+
+    // Pulsing congratulatory message
+    const msg = document.createElement('h1');
+    msg.className = 'victory-message';
+    msg.textContent = "Congratulations, you've finished the game!";
+    msg.style.fontSize = Math.min(canvasRect.width / 15, 48) + 'px';
+    msg.style.position = 'absolute';
+    msg.style.top = '35%';
+    msg.style.left = '0';
+    msg.style.right = '0';
+    msg.style.textAlign = 'center';
+    msg.style.margin = '0 auto';
+    msg.style.padding = '0 10px';
+    overlay.appendChild(msg);
+
+    // Play again button (bigger)
+    const restartBtn = document.createElement('button');
+    restartBtn.className = 'victory-button';
+    restartBtn.textContent = 'Play again';
+    restartBtn.style.fontSize = Math.min(canvasRect.width / 15, 28) + 'px';
+    restartBtn.style.position = 'absolute';
+    restartBtn.style.bottom = '20%';
+    restartBtn.style.left = '50%';
+    restartBtn.style.transform = 'translateX(-50%)';
+    restartBtn.style.padding = '16px 40px';
+    restartBtn.style.minWidth = '200px';
+    restartBtn.style.minHeight = '60px';
+    restartBtn.addEventListener('click', () => {
+        overlay.remove();
+        victoryMusic.pause();
+        victoryMusic.currentTime = 0;
+        localStorage.setItem('trustIssuesLevel', 1);
+        startGame(1);
+    });
+    overlay.appendChild(restartBtn);
+}
+
+// Confetti for win screen
+function drawWinConfetti(canvas) {
+    const ctx = canvas.getContext('2d');
+    const confettiCount = 80;
+    const confetti = [];
+    
+    // Create confetti pieces
+    for (let i = 0; i < confettiCount; i++) {
+        confetti.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * -canvas.height,
+            w: Math.random() * 8 + 4,
+            h: Math.random() * 8 + 4,
+            vx: (Math.random() - 0.5) * 2,
+            vy: Math.random() * 3 + 2,
+            rotation: Math.random() * 360,
+            rotationSpeed: (Math.random() - 0.5) * 6,
+            color: `hsl(${Math.random() * 360}, 90%, 60%)`,
+            gravity: 0.1
+        });
+    }
+    
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        confetti.forEach(piece => {
+            // Update position
+            piece.x += piece.vx;
+            piece.y += piece.vy;
+            piece.vy += piece.gravity;
+            piece.rotation += piece.rotationSpeed;
+            
+            // Reset if off screen
+            if (piece.y > canvas.height) {
+                piece.y = -20;
+                piece.x = Math.random() * canvas.width;
+                piece.vy = Math.random() * 3 + 2;
+            }
+            if (piece.x > canvas.width) piece.x = 0;
+            if (piece.x < 0) piece.x = canvas.width;
+            
+            // Draw confetti piece
+            ctx.save();
+            ctx.translate(piece.x + piece.w/2, piece.y + piece.h/2);
+            ctx.rotate((piece.rotation * Math.PI) / 180);
+            ctx.fillStyle = piece.color;
+            ctx.fillRect(-piece.w/2, -piece.h/2, piece.w, piece.h);
+            ctx.restore();
+        });
+        
+        requestAnimationFrame(animate);
+    }
+    
+    animate();
+}
+
 // Game loop
 function runGameLoop() {
     clearInterval(gameInterval);
@@ -399,7 +526,7 @@ function runGameLoop() {
 
 // Update game state
 function update() {
-    // --- Level 6: Reveal moving hole trap when player is close ---
+    // Level 6: Make moving hole visible when player is close
     if (currentLevel === 6) {
         traps.forEach(t => {
             if (t.type === "moving_hole" && Math.abs(player.x - t.x) < (t.movement && t.movement.triggerDistance ? t.movement.triggerDistance : 120)) {
@@ -408,7 +535,7 @@ function update() {
         });
     }
     
-    // --- Level 7: Trigger spike after player moves ---
+    // Level 7: Trigger spike after player moves 
     if (currentLevel === 7 && !level7SpikeTimerStarted) {
         if (player.dx !== 0 || player.dy !== 0) {
             // Find all spike traps with appearAfterMove
@@ -433,7 +560,7 @@ function update() {
         }
     }
     
-    // --- Level 8: Trigger moving wall after player moves ---
+    //Level 8: Trigger moving wall after player moves 
     if (currentLevel === 8 && !level8WallTimerStarted) {
         if (player.dx !== 0 || player.dy !== 0) {
             // Find all moving wall traps with appearAfterMove
@@ -443,13 +570,13 @@ function update() {
                 walls.forEach(wall => {
                     level8WallTimeout = setTimeout(() => {
                         wall.hidden = false;
-                    }, wall.movement && wall.movement.triggerDelay ? wall.movement.triggerDelay : 2000);
+                    }, wall.movement && wall.movement.triggerDelay ? wall.movement.triggerDelay : 1500);
                 });
             }
         }
     }
     
-    // --- Level 9: Trigger disappearing floor after player moves ---
+    // Level 9: Trigger disappearing floor after player moves
     if (currentLevel === 9 && !level9DisappearTimerStarted) {
         if (player.dx !== 0 || player.dy !== 0) {
             // Find all platforms with disappearing property
@@ -465,7 +592,7 @@ function update() {
         }
     }
     
-    // --- Level 10: Start moving dots after 5 seconds ---
+    // Level 10: Start moving dots after 4 seconds
     if (currentLevel === 10 && !level10DotsTimerStarted) {
         level10DotsTimerStarted = true;
         level10DotsTimeout = setTimeout(() => {
@@ -474,7 +601,7 @@ function update() {
                     trap.moving = true;
                 }
             });
-        }, 5000);
+        }, 4000);
     }
     
     if (gamePaused) return;
@@ -511,7 +638,7 @@ function update() {
     // Platform collision (skip if player is over a hole)
     player.onGround = false;
     platforms.forEach(p => {
-        if (p.disappeared) return; // Skip disappeared platforms for collision
+        if (p.disappeared) return; // Skip disappeared platforms
         let overHole = false;
         traps.forEach(t => {
             if (
@@ -651,20 +778,9 @@ function update() {
     }
 }
 
-// // Custom spike trick logic
-    // let leftSpike = traps.find(t => t.id === "leftSpike");
-    // let rightSpike = traps.find(t => t.id === "rightSpike");
-
-    // // Both spikes are still until player jumps over the right spike
-    // if (rightSpike && player.x > rightSpike.x + rightSpike.width) {
-    //     // When player jumps over the right spike, allow left spike to move left if player approaches
-    //     if (leftSpike && player.x > leftSpike.x + leftSpike.width) {
-    //         leftSpike.x -= 3; // Move left to trick the player
-    //     }
-    // }
 let debugMode = false;
 
-// Debug toggle (if you have a debugToggle button in HTML)
+// Debug toggle (HTML button)
 const debugToggle = document.getElementById('debugToggle');
 if (debugToggle) {
     debugToggle.addEventListener('click', () => {
@@ -713,7 +829,7 @@ let soundEnabled = true;
 
 function playSound(sound) {
     if (!soundEnabled) return;
-    // Always reset to start for short SFX
+    // Always reset to start
     sound.currentTime = 0;
     sound.play();
 }
