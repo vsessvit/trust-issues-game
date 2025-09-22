@@ -1,4 +1,4 @@
-@media (min-width: 601px) and (max-width: 1400px) and (orientation: landscape) {
+@media (min-width: 601px) and (max-width: 1400px) {
     body .onscreen-controls {
         display: none !important;
         opacity: 0 !important;
@@ -1321,6 +1321,45 @@ footer {
 .pause-btn#resetBtn {
     background: #ED6509;
     color: #F5F5DC;
+}
+
+#fallOutPopup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #ED6509;
+  color: #F5F5DC;
+  border-radius: 14px;
+  box-shadow: 0 0 20px #ED6509;
+  z-index: 100000;
+  padding: 32px 24px;
+  text-align: center;
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#fallOutPopup.hidden {
+  display: none !important;
+}
+
+#fallOutPopup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #ED6509;
+    color: #F5F5DC;
+    border-radius: 14px;
+    box-shadow: 0 0 20px #ED6509;
+    z-index: 100000;
+    padding: 32px 24px;
+    text-align: center;
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .container {

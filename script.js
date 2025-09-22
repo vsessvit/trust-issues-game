@@ -28,6 +28,8 @@ let explosionTimer = 0;
 let showRestartMessage = false;
 let goalReached = false;
 let showResetPopup = false;
+let showFallOutPopup = false;
+let fallOutPopupTimer = 0;
 
 // Load sounds
 const jumpSound = new Audio('assets/sounds/jump.wav');
@@ -383,6 +385,22 @@ function update() {
     player.dy += gravity;
     player.x += player.dx;
     player.y += player.dy;
+
+    // Detect if player walks outside the screen
+    if (!playerDead && (
+        player.x + player.width < 0 ||
+        player.x > canvas.width ||
+        player.y > canvas.height ||
+        player.y + player.height < 0
+    )) {
+        showFallOutPopup = true;
+        fallOutPopupTimer = 60; // 1 second at 60 FPS
+        playerDead = true;
+        explosionTimer = 0;
+        player.dx = 0;
+        player.dy = 0;
+        lives--;
+    }
 
     // Platform collision (skip if player is over a hole)
     player.onGround = false;
@@ -763,6 +781,21 @@ function draw() {
         resetPopup.classList.remove('hidden');
     } else if (resetPopup) {
         resetPopup.classList.add('hidden');
+    }
+
+    // Show fall out popup
+    const fallOutPopup = document.getElementById('fallOutPopup');
+    if (showFallOutPopup && fallOutPopup) {
+        fallOutPopup.classList.remove('hidden');
+        if (fallOutPopupTimer > 0) {
+            fallOutPopupTimer--;
+        } else {
+            fallOutPopup.classList.add('hidden');
+            showFallOutPopup = false;
+            showRestartMessage = true;
+        }
+    } else if (fallOutPopup) {
+        fallOutPopup.classList.add('hidden');
     }
 
     frameCounter++;
