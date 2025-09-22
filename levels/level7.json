@@ -1,6 +1,6 @@
 {
     "level": 7,
-    "player": {"startX": 870, "startY": 470, "width": 30, "height": 50, "color": "#000000"},
+    "player": {"startX": 870, "startY": 400, "width": 30, "height": 50, "color": "#000000"},
     "platforms": [
         {"x": 0, "y": 450, "width": 790, "height": 50, "color": "#F4A460"},
         {"x": 788, "y": 500, "width": 80, "height":2, "color": "#F4A460"},
@@ -8,7 +8,8 @@
         {"x": 0, "y": 380, "width": 910, "height": 20, "color": "#F4A460"}
     ],
     "traps": [
-        {"x": -120, "y": 430, "width": 120, "height": 20, "color": "#8B4513", "type": "moving_spikes", "movement": {"triggerDelay": 4000, "direction": "right", "speed": 4}, "appearAfterMove": true}
+        {"x": -120, "y": 430, "width": 120, "height": 20, "color": "#8B4513", "type": "moving_spikes", "movement": {"triggerDelay": 3000, "direction": "right", "speed": 4}, "appearAfterMove": true},
+        {"x": 910, "y": 430, "width": 120, "height": 20, "color": "#8B4513", "type": "moving_spikes", "movement": {"triggerDelay": 6000, "direction": "left", "speed": 4}, "appearAfterMove": true}
     ],
     "goal": {"x": 10, "y": 400, "width": 40, "height": 50, "color": "#C0C0C0"},
     "background": {"color": "#B97A1A"},

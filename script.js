@@ -13,10 +13,18 @@ let platforms = [];
 let traps = [];
 let level7SpikeTimerStarted = false;
 let level7SpikeTimeout = null;
+let level9DisappearTimerStarted = false;
+let level9DisappearTimeout = null;
+let level8WallTimerStarted = false;
+let level8WallTimeout = null;
+let level10DotsTimerStarted = false;
+let level10DotsTimeout = null;
 const victoryMusic = new Audio('assets/sounds/victory.mp3'); // Add a happy victory music file (you need to provide this file)
 let lives = 5;
 let timer = 0;
 let gameInterval;
+let level5SpikeTimeout = null;
+let level5SpikeInterval = null;
 let levelData = {};
 let gamePaused = true;
 let deathPieces = [];
@@ -35,14 +43,6 @@ let fallOutPopupTimer = 0;
 const jumpSound = new Audio('assets/sounds/jump.wav');
 const trapSound = new Audio('assets/sounds/trap.wav');
 const winSound = new Audio('assets/sounds/win.wav');
-
-// // Load player frames
-// const playerFrames = [];
-// for (let i = 1; i <= 8; i++) {
-//     const img = new Image();
-//     img.src = `assets/images/player${i}.jpg`;
-//     playerFrames.push(img);
-// }
 
 let currentFrame = 0;
 let frameCounter = 0;
@@ -241,6 +241,36 @@ function loadLevel(levelNum) {
         clearTimeout(level7SpikeTimeout);
         level7SpikeTimeout = null;
     }
+    // Reset level 9 disappear timer state
+    level9DisappearTimerStarted = false;
+    if (level9DisappearTimeout) {
+        clearTimeout(level9DisappearTimeout);
+        level9DisappearTimeout = null;
+    }
+    
+    // Reset level 8 wall timer state
+    level8WallTimerStarted = false;
+    if (level8WallTimeout) {
+        clearTimeout(level8WallTimeout);
+        level8WallTimeout = null;
+    }
+    
+    // Reset level 10 dots timer state
+    level10DotsTimerStarted = false;
+    if (level10DotsTimeout) {
+        clearTimeout(level10DotsTimeout);
+        level10DotsTimeout = null;
+    }
+    
+    // Clear level 5 spike timers/intervals to prevent leftover spikes
+    if (typeof level5SpikeTimeout !== 'undefined' && level5SpikeTimeout) {
+        clearTimeout(level5SpikeTimeout);
+        level5SpikeTimeout = null;
+    }
+    if (typeof level5SpikeInterval !== 'undefined' && level5SpikeInterval) {
+        clearInterval(level5SpikeInterval);
+        level5SpikeInterval = null;
+    }
     goalReached = false;
     currentLevel = levelNum;
     console.log(`Loading level: ${levelNum}`); // Debugging log
@@ -277,13 +307,24 @@ function loadLevel(levelNum) {
 
             // --- Level 5: Timed spike spawning logic ---
             if (levelNum === 5) {
-                // Only spawn spikes if not already present
+                // Clear previous spike timers if any
+                if (level5SpikeTimeout) {
+                    clearTimeout(level5SpikeTimeout);
+                    level5SpikeTimeout = null;
+                }
+                if (level5SpikeInterval) {
+                    clearInterval(level5SpikeInterval);
+                    level5SpikeInterval = null;
+                }
+                // Remove any existing spikes
+                traps = traps.filter(t => t.type !== 'spikes');
                 let spikeStep = 0;
-                const stepPlatforms = platforms.slice(0, 10); // 10 steps
-                setTimeout(() => {
-                    const spikeInterval = setInterval(() => {
+                const stepPlatforms = platforms.slice(0, 11); // 11 steps
+                level5SpikeTimeout = setTimeout(() => {
+                    level5SpikeInterval = setInterval(() => {
                         if (spikeStep >= stepPlatforms.length) {
-                            clearInterval(spikeInterval);
+                            clearInterval(level5SpikeInterval);
+                            level5SpikeInterval = null;
                             return;
                         }
                         const p = stepPlatforms[spikeStep];
@@ -298,7 +339,7 @@ function loadLevel(levelNum) {
                         });
                         spikeStep++;
                     }, 1000); //1 second between each spike
-                }, 5000); //seconds delay before spikes start appearing
+                }, 3000); //3 seconds delay before spikes start appearing
             }
             // --- End Level 5 spike logic ---
         })
@@ -358,19 +399,84 @@ function runGameLoop() {
 
 // Update game state
 function update() {
+    // --- Level 6: Reveal moving hole trap when player is close ---
+    if (currentLevel === 6) {
+        traps.forEach(t => {
+            if (t.type === "moving_hole" && Math.abs(player.x - t.x) < (t.movement && t.movement.triggerDistance ? t.movement.triggerDistance : 120)) {
+                t.hidden = false;
+            }
+        });
+    }
+    
     // --- Level 7: Trigger spike after player moves ---
     if (currentLevel === 7 && !level7SpikeTimerStarted) {
         if (player.dx !== 0 || player.dy !== 0) {
-            // Find the spike trap with appearAfterMove
-            const spike = traps.find(t => t.appearAfterMove && t.hidden);
-            if (spike) {
+            // Find all spike traps with appearAfterMove
+            const spikes = traps.filter(t => t.appearAfterMove && t.hidden);
+            if (spikes.length) {
                 level7SpikeTimerStarted = true;
-                level7SpikeTimeout = setTimeout(() => {
-                    spike.hidden = false;
-                }, spike.movement && spike.movement.triggerDelay ? spike.movement.triggerDelay : 2500);
+                spikes.forEach(spike => {
+                    level7SpikeTimeout = setTimeout(() => {
+                        spike.hidden = false;
+                        // If spike moves right, schedule direction reversal after 3 seconds
+                        if (spike.movement && spike.movement.direction === "right") {
+                            // Use a longer delay for the second spike
+                            let reverseDelay = 3000;
+                            if (spike.x > 800) reverseDelay = 6000;
+                            setTimeout(() => {
+                                spike.movement.direction = "left";
+                            }, 6000);
+                        }
+                    }, spike.movement && spike.movement.triggerDelay ? spike.movement.triggerDelay : 3000);
+                });
             }
         }
     }
+    
+    // --- Level 8: Trigger moving wall after player moves ---
+    if (currentLevel === 8 && !level8WallTimerStarted) {
+        if (player.dx !== 0 || player.dy !== 0) {
+            // Find all moving wall traps with appearAfterMove
+            const walls = traps.filter(t => t.appearAfterMove && t.hidden);
+            if (walls.length) {
+                level8WallTimerStarted = true;
+                walls.forEach(wall => {
+                    level8WallTimeout = setTimeout(() => {
+                        wall.hidden = false;
+                    }, wall.movement && wall.movement.triggerDelay ? wall.movement.triggerDelay : 2000);
+                });
+            }
+        }
+    }
+    
+    // --- Level 9: Trigger disappearing floor after player moves ---
+    if (currentLevel === 9 && !level9DisappearTimerStarted) {
+        if (player.dx !== 0 || player.dy !== 0) {
+            // Find all platforms with disappearing property
+            const disappearingPlatforms = platforms.filter(p => p.disappearing && !p.disappeared);
+            if (disappearingPlatforms.length) {
+                level9DisappearTimerStarted = true;
+                disappearingPlatforms.forEach(platform => {
+                    level9DisappearTimeout = setTimeout(() => {
+                        platform.disappeared = true;
+                    }, platform.disappearDelay ? platform.disappearDelay : 3000);
+                });
+            }
+        }
+    }
+    
+    // --- Level 10: Start moving dots after 5 seconds ---
+    if (currentLevel === 10 && !level10DotsTimerStarted) {
+        level10DotsTimerStarted = true;
+        level10DotsTimeout = setTimeout(() => {
+            traps.forEach(trap => {
+                if (trap.type === "movingDot") {
+                    trap.moving = true;
+                }
+            });
+        }, 5000);
+    }
+    
     if (gamePaused) return;
     if (keys['ArrowLeft']) player.dx = -3;
     else if (keys['ArrowRight']) player.dx = 3;
@@ -405,6 +511,7 @@ function update() {
     // Platform collision (skip if player is over a hole)
     player.onGround = false;
     platforms.forEach(p => {
+        if (p.disappeared) return; // Skip disappeared platforms for collision
         let overHole = false;
         traps.forEach(t => {
             if (
@@ -457,7 +564,12 @@ function update() {
             player.x + player.width > t.x &&
             player.x < t.x + t.width &&
             player.y + player.height > t.y - t.height &&
-            player.y < t.y
+            player.y < t.y ||
+            (t.type === "movingDot" &&
+                player.x + player.width > t.x &&
+                player.x < t.x + t.width &&
+                player.y + player.height > t.y &&
+                player.y < t.y + t.height)
         ) {
             //player dies
             if (!playerDead) { // Only decrement lives once per death
@@ -472,9 +584,16 @@ function update() {
 
         // Move traps if they are "moving_hole" or "moving_spikes"
         if (t.type === "moving_hole" && Math.abs(player.x - t.x) < t.movement.triggerDistance) {
-            t.x -= t.movement.speed;
+            if (t.hidden) t.hidden = false; // Reveal the hole when player is close
+            // Only move if movement.speed is set and nonzero
+            if (t.movement && t.movement.speed) {
+                t.x -= t.movement.speed;
+            }
+        } else if (t.type === "moving_hole" && !t.hidden && t.movement && t.movement.speed === 0) {
+            // If hole is revealed and speed is zero, keep it visible
+            // No movement, just ensure it's drawn
         }
-        if (t.type === "moving_spikes") {
+    if (t.type === "moving_spikes") {
             // For level 7, only move if not hidden
             if (t.hidden) return;
             // If triggerDistance is set, only move if player is close
@@ -485,6 +604,15 @@ function update() {
             } else {
                 // For level 7, just move every frame once revealed
                 t.x += t.movement.direction === "left" ? -t.movement.speed : t.movement.speed;
+            }
+        }
+        
+        // Move movingDot traps (Level 10)
+        if (t.type === "movingDot" && t.moving) {
+            if (t.direction === "right") {
+                t.x += t.speed;
+            } else if (t.direction === "left") {
+                t.x -= t.speed;
             }
         }
     });
@@ -681,14 +809,20 @@ function draw() {
 
     // Draw platforms
     platforms.forEach(p => {
+        if (p.disappeared) return; // Don't draw disappeared platforms
         ctx.fillStyle = p.color || '#F4A460'; // Platform color
         ctx.fillRect(p.x, p.y, p.width, p.height);
     });
 
     // Draw traps
     traps.forEach(t => {
-        if (t.hidden) return; // Don't draw hidden traps (for level 7 spike)
-        if (t.type === "spikes" || t.type === "moving_spikes") {
+        if (t.type === "moving_hole") {
+            if (t.hidden) return; // Don't draw hidden holes
+            ctx.fillStyle = t.visibleColor || "#000000";
+            ctx.fillRect(t.x, t.y, t.width, t.height);
+        } else if (t.hidden) {
+            return; // Don't draw other hidden traps
+        } else if (t.type === "spikes" || t.type === "moving_spikes") {
             // Draw spikes as triangles
             ctx.fillStyle = t.color || '#8B4513'; // Spike color
             const spikeCount = Math.floor(t.width / 10); // Number of spikes based on width
@@ -700,10 +834,6 @@ function draw() {
                 ctx.closePath();
                 ctx.fill();
             }
-        } else if (t.type === "moving_hole") {
-            // Draw holes as empty rectangles
-            ctx.fillStyle = "#000000"; // Hole color matches the background
-            ctx.fillRect(t.x, t.y, t.width, t.height);
         } else {
             // Default trap rendering
             ctx.fillStyle = t.color || '#FF4500';
