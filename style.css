@@ -275,7 +275,7 @@ html, body {
     }
     canvas#gameCanvas {
         display: block;
-            margin: 10px auto 40 auto;
+        margin: 10px auto 40 auto;
         width: 910px;
         height: 550px;
         max-width: 910px;
@@ -730,7 +730,7 @@ html {
 .start-button {
     background-color: #ED6509;
     color: #F5F5DC;
-    border: none;
+    border: 7px solid transparent;
     padding: 1.2rem 2.2rem;
     font-size: 1.4rem;
     border-radius: 12px;
