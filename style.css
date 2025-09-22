@@ -217,19 +217,19 @@ html, body {
 
 /* Large screens: match laptop layout exactly */
 @media (min-width: 1400px) {
-    /* Move .left-controls higher and make buttons bigger on large screens */
     .instructions-centered {
+        top: 40%;
         font-size: 2.1rem !important;
         padding: 2.5rem 3.5rem !important;
         border-radius: 18px !important;
         max-width: 1200px !important;
     }
     .start-button {
-        font-size: 2.1rem !important;
-        padding: 1.5rem 3.5rem !important;
+        font-size: 2.2rem !important;
+        padding: 1.8rem 3.5rem !important;
         border-radius: 18px !important;
         min-width: 320px !important;
-        min-height: 80px !important;
+        min-height: 90px !important;
     }
     .level-select {
         gap: 24px !important;
@@ -308,6 +308,14 @@ html, body {
         height: 60px;
         font-size: 1.3rem;
         padding: 16px 24px;
+    }
+    
+    /* Dropdown menu opens to the right on large screens */
+    #languageMenu.dropdown-menu {
+        left: 100% !important;
+        top: 0 !important;
+        bottom: auto !important;
+        margin-left: 8px !important;
     }
 }
 
@@ -409,6 +417,22 @@ html {
         min-height: 100vh !important;
         overflow-y: auto !important;
     }
+
+    .instructions-centered {
+        font-size: 1.8rem !important;
+        padding: 1.5rem 4rem !important;
+        color: #F5F5DC !important;
+        display: block !important;
+        max-width: 95vw !important;
+        line-height: 1.3 !important;
+    }
+
+    .start-button {
+        font-size: 1.8rem !important;
+        padding: 1.5rem 2.8rem !important;
+        min-width: 280px !important;
+        min-height: 70px !important;
+    }
     
     /* Volume and settings buttons smaller, above footer */
     .left-controls {
@@ -450,14 +474,14 @@ html {
         flex-wrap: wrap;
         justify-content: center;
         gap: 12px;
-        max-width: 400px;
-        min-width: 400px;
+        max-width: 450px;
+        min-width: 450px;
         z-index: 10;
     }
     
     .level-btn {
-        flex: 0 0 calc(20% - 12px);
-        max-width: calc(20% - 12px);
+        flex: 0 0 calc(30% - 12px);
+        max-width: calc(30% - 12px);
         min-width: 60px;
         min-height: 50px;
         font-size: 1.1rem;
@@ -589,7 +613,36 @@ html {
         background-repeat: no-repeat !important;
         background-color: #1a120a !important; /* fallback color */
         width: 100vw !important;
+        min-height: 100svh !important;
     }
+
+    #start-screen {
+        background-image: url('assets/images/HomepageBackgroundMobile.jpg');
+        background-size: cover !important;
+        background-position: center !important;
+        background-repeat: no-repeat !important;
+        background-color: rgba(0,0,0,0.7) !important; /* semi-transparent overlay */
+        height: 100svh !important;
+    }
+
+
+    .start-button {
+        font-size: 1.3rem !important;
+        padding: 1.2rem 2rem !important;
+        min-width: 200px !important;
+        min-height: 55px !important;
+    }
+
+    .start-button-container {
+        top: 60% !important; /* Move button higher on mobile */
+        margin-bottom: 8svh !important;
+    }
+
+    .level-select {
+        top: calc(70% + 10px) !important; /* Move level buttons higher or lower on mobile */
+        margin-bottom: 8svh !important;
+    }
+}
     
     /* Mobile portrait specific adjustments */
     @media (orientation: portrait) {
@@ -611,7 +664,7 @@ html {
             margin: 0 !important;
         }
     }
-}
+
 
 /* Remove orientation restrictions - allow both orientations */
 @media only screen and (orientation: portrait) {
@@ -621,23 +674,22 @@ html {
     /* Game works in both orientations now */
 }
 
-/* Instructions header over background */
 .instructions-centered {
     position: absolute;
     top: 40%;
     left: 50%;
     transform: translate(-50%, -50%);
-    padding: 1rem 2rem;
+    padding: 1rem 3rem;
     border-radius: 10px;
-    color: var(--text-color);
-    text-align: left;
-    max-width: 100vw;
-    width: 100vw;
+    color: #F5F5DC;
+    max-width: 95vw;
+    width: auto;
     z-index: 10;
-    font-size: 1rem;
-    display: block;
-    text-align: center;
     font-size: 1.2rem;
+    display: block;
+    position: relative;
+    text-align: center;
+    line-height: 1.4;
 }
 
 .start-button-container {
@@ -651,7 +703,7 @@ html {
 
     .level-select {
         position: absolute;
-    top: calc(70% + 10px);
+        top: calc(70% + 10px);
         left: 50%;
         transform: translate(-50%, 0);
         margin-top: 0;
@@ -660,7 +712,7 @@ html {
         flex-wrap: wrap;
         justify-content: center;
         gap: 10px;
-        max-width: 260px;
+        max-width: 60px;
         min-width: 260px;
         margin-left: auto;
         margin-right: auto;
@@ -678,12 +730,21 @@ html {
     background-color: #ED6509;
     color: #F5F5DC;
     border: none;
-    padding: 1rem 2rem;
-    font-size: 1.2rem;
-    border-radius: 10px;
+    padding: 1.2rem 2.2rem;
+    font-size: 1.4rem;
+    border-radius: 12px;
     cursor: pointer;
     animation: pulse 1.5s infinite;
     box-shadow: 0 0 10px #ED701C;
+    min-width: 220px;
+    min-height: 60px;
+    transition: all 0.3s ease;
+}
+
+.start-button:hover {
+    background-color: transparent;
+    box-shadow: 0 0 20px #FF6347;
+    transform: scale(1.05);
 }
 
 .left-controls {
@@ -707,7 +768,7 @@ html {
     }
 }
 
-/* Button styling based on your palette */
+/* Button styling based on palette */
 .left-controls button {
     width: 160px;
     font-size: 1rem;
