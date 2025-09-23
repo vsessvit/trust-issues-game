@@ -19,7 +19,7 @@ let level8WallTimerStarted = false;
 let level8WallTimeout = null;
 let level10DotsTimerStarted = false;
 let level10DotsTimeout = null;
-const victoryMusic = new Audio('assets/sounds/victory.mp3'); // Add a happy victory music file (you need to provide this file)
+const victoryMusic = new Audio('assets/sounds/victory.wav'); 
 let lives = 5;
 let timer = 0;
 let gameInterval;
@@ -43,6 +43,7 @@ let fallOutPopupTimer = 0;
 const jumpSound = new Audio('assets/sounds/jump.wav');
 const trapSound = new Audio('assets/sounds/trap.wav');
 const winSound = new Audio('assets/sounds/win.wav');
+const deathSound = new Audio('assets/sounds/death.wav');
 
 let currentFrame = 0;
 let frameCounter = 0;
@@ -92,8 +93,14 @@ function actuallyStartGame(levelNum) {
 function showVictoryAnimation() {
     stopAllSounds();
     if (soundEnabled) {
-        victoryMusic.currentTime = 0;
-        victoryMusic.play();
+        try {
+            victoryMusic.currentTime = 0;
+            victoryMusic.play().catch(e => {
+                console.log('Victory music play prevented:', e);
+            });
+        } catch (e) {
+            console.log('Victory music error:', e);
+        }
     }
     // Fade out the canvas and show a big message
     const overlay = document.createElement('div');
@@ -235,12 +242,6 @@ function drawConfetti(canvas) {
 
 // Load level from JSON
 function loadLevel(levelNum) {
-    // Check if level exists (only levels 1-10 are available)
-    if (levelNum < 1 || levelNum > 10) {
-        console.error(`Level ${levelNum} does not exist. Available levels: 1-10`);
-        return;
-    }
-    
     // Reset level 7 spike timer state
     level7SpikeTimerStarted = false;
     if (level7SpikeTimeout) {
@@ -386,13 +387,19 @@ function onPlayerReachGoal() {
         // Stop the animation when the doors are fully closed
         if (leftDoor.width <= 0 || rightDoor.width <= 0) {
             clearInterval(animationInterval);
-
-            // Transition to the next level with elevator animation
-            setTimeout(() => {
-                elevatorTransition(() => {
-                    loadLevel(currentLevel + 1);
-                });
-            }, 300); // Shortened delay after door animation
+            // Only transition to next level if currentLevel < 10
+            if (currentLevel < 10) {
+                setTimeout(() => {
+                    elevatorTransition(() => {
+                        loadLevel(currentLevel + 1);
+                    });
+                }, 300); // Shortened delay after door animation
+            } else {
+                // If level 10, show completion animation
+                setTimeout(() => {
+                    showGameCompletionAnimation();
+                }, 300);
+            }
         }
     }, doorAnimationDuration / 50); // Smooth animation (50 frames)
 }
@@ -401,8 +408,14 @@ function onPlayerReachGoal() {
 function showGameCompletionAnimation() {
     stopAllSounds();
     if (soundEnabled) {
-        victoryMusic.currentTime = 0;
-        victoryMusic.play();
+        try {
+            victoryMusic.currentTime = 0;
+            victoryMusic.play().catch(e => {
+                console.log('Victory music play prevented:', e);
+            });
+        } catch (e) {
+            console.log('Victory music error:', e);
+        }
     }
     
     // Get canvas position and size
@@ -632,6 +645,7 @@ function update() {
         player.y > canvas.height ||
         player.y + player.height < 0
     )) {
+        playSound(deathSound);
         showFallOutPopup = true;
         fallOutPopupTimer = 60; // 1 second at 60 FPS
         playerDead = true;
@@ -707,6 +721,7 @@ function update() {
             //player dies
             if (!playerDead) { // Only decrement lives once per death
                 playSound(trapSound);
+                playSound(deathSound);
                 playerDead = true;
                 explosionTimer = 0;
                 player.dx = 0;
@@ -775,10 +790,15 @@ function update() {
         player.y + player.height > goal.y
     ) {
         goalReached = true;
+        // Play win sound when reaching goal
+        playSound(winSound);
     // Move player into the center of the door
     player.x = goal.x + (goal.width - player.width) / 2;
     player.y = goal.y + (goal.height - player.height) / 2;
-        localStorage.setItem('trustIssuesLevel', currentLevel + 1);
+        // Only save progress if not on the final level
+        if (currentLevel < 10) {
+            localStorage.setItem('trustIssuesLevel', currentLevel + 1);
+        }
         gamePaused = true;
         onPlayerReachGoal();
     }
@@ -835,13 +855,20 @@ let soundEnabled = true;
 
 function playSound(sound) {
     if (!soundEnabled) return;
-    // Always reset to start
-    sound.currentTime = 0;
-    sound.play();
+    try {
+        // Always reset to start
+        sound.currentTime = 0;
+        sound.play().catch(e => {
+            // Handle autoplay restrictions silently
+            console.log('Audio play prevented:', e);
+        });
+    } catch (e) {
+        console.log('Audio error:', e);
+    }
 }
 
 function stopAllSounds() {
-    [jumpSound, trapSound, winSound].forEach(snd => {
+    [jumpSound, trapSound, winSound, deathSound, victoryMusic].forEach(snd => {
         snd.pause();
         snd.currentTime = 0;
     });
@@ -1096,7 +1123,6 @@ function showWinModal(callback) {
     winModal.show();
 }
 
-// Add this function to your script.js file
 function createWinModal() {
     const winModalEl = document.getElementById('winModal');
     
@@ -1253,7 +1279,52 @@ document.addEventListener('DOMContentLoaded', () => {
     // Start button (main)
     if (mainStartButton) {
         mainStartButton.addEventListener('click', () => {
-            startGame(getUnlockedLevel());
+            const savedLevel = localStorage.getItem('trustIssuesLevel');
+            if (savedLevel && parseInt(savedLevel) > 10) {
+                // Show custom message and Got it button
+                const overlay = document.createElement('div');
+                overlay.style.position = 'fixed';
+                overlay.style.top = '0';
+                overlay.style.left = '0';
+                overlay.style.width = '100vw';
+                overlay.style.height = '100vh';
+                overlay.style.background = 'rgba(0,0,0,0.95)';
+                overlay.style.display = 'flex';
+                overlay.style.flexDirection = 'column';
+                overlay.style.justifyContent = 'center';
+                overlay.style.alignItems = 'center';
+                overlay.style.zIndex = '99999';
+                overlay.style.transition = 'opacity 1s';
+                overlay.style.opacity = '1';
+                document.body.appendChild(overlay);
+
+                const msg = document.createElement('h1');
+                msg.textContent = 'You finished the game!';
+                msg.style.color = '#FFD700';
+                msg.style.fontSize = '3rem';
+                msg.style.textShadow = '0 0 20px #ED6509, 0 0 40px #fff';
+                msg.style.marginBottom = '30px';
+                overlay.appendChild(msg);
+
+                const gotItBtn = document.createElement('button');
+                gotItBtn.textContent = 'Got it';
+                gotItBtn.style.background = '#ED6509';
+                gotItBtn.style.color = '#fff';
+                gotItBtn.style.fontSize = '1.5rem';
+                gotItBtn.style.padding = '16px 40px';
+                gotItBtn.style.border = 'none';
+                gotItBtn.style.borderRadius = '10px';
+                gotItBtn.style.marginTop = '40px';
+                gotItBtn.style.cursor = 'pointer';
+                gotItBtn.style.boxShadow = '0 0 20px #ED6509';
+                gotItBtn.addEventListener('click', () => {
+                    overlay.remove();
+                    localStorage.setItem('trustIssuesLevel', 1);
+                });
+                overlay.appendChild(gotItBtn);
+            } else {
+                startGame(getUnlockedLevel());
+            }
         });
     }
 
