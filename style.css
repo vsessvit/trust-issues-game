@@ -271,8 +271,10 @@ html, body {
         justify-content: flex-start;
         width: 100vw;
         height: 100vh;
-        margin-top: 50px;
+        margin-top: 70px !important;
+        padding-top: 30px !important;
     }
+
     canvas#gameCanvas {
         display: block;
         margin: 10px auto 40 auto;

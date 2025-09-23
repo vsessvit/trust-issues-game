@@ -235,6 +235,12 @@ function drawConfetti(canvas) {
 
 // Load level from JSON
 function loadLevel(levelNum) {
+    // Check if level exists (only levels 1-10 are available)
+    if (levelNum < 1 || levelNum > 10) {
+        console.error(`Level ${levelNum} does not exist. Available levels: 1-10`);
+        return;
+    }
+    
     // Reset level 7 spike timer state
     level7SpikeTimerStarted = false;
     if (level7SpikeTimeout) {
