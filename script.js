@@ -11,6 +11,7 @@ let player = {
     y: 500,
     width: 30,
     height: 30,
+
     dx: 0,
     dy: 0,
     onGround: false
