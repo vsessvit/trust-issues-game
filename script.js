@@ -6,7 +6,15 @@ canvas.height = 550; // New height for a taller game window
 
 // Game variables
 let currentLevel = 1;
-let player = { x: 50, y: 500, width: 30, height: 30, dx: 0, dy: 0, onGround: false };
+let player = {
+    x: 50,
+    y: 500,
+    width: 30,
+    height: 30,
+    dx: 0,
+    dy: 0,
+    onGround: false
+};
 let gravity = 0.5;
 let keys = {};
 let platforms = [];
@@ -19,7 +27,7 @@ let level8WallTimerStarted = false;
 let level8WallTimeout = null;
 let level10DotsTimerStarted = false;
 let level10DotsTimeout = null;
-const victoryMusic = new Audio('assets/sounds/victory.wav'); 
+const victoryMusic = new Audio('assets/sounds/victory.wav');
 let lives = 5;
 let timer = 0;
 let gameInterval;
@@ -45,7 +53,6 @@ const trapSound = new Audio('assets/sounds/trap.wav');
 const winSound = new Audio('assets/sounds/win.wav');
 const deathSound = new Audio('assets/sounds/death.wav');
 
-let currentFrame = 0;
 let frameCounter = 0;
 const frameSpeed = 5;
 
@@ -58,26 +65,20 @@ function getSavedLevel() {
 // Start game logic
 function startGame(levelNum) {
     console.log(`Starting game at level: ${levelNum}`);
-    
-    // Start game directly for all devices (desktop and mobile)
-    actuallyStartGame(levelNum);
-}
 
-// Legacy rotate overlay function - no longer needed as we support both orientations
-function showRotateOverlayForGameStart(levelNum) {
-    // This function is deprecated - we now support both orientations
+    // Start game directly for all devices (desktop and mobile)
     actuallyStartGame(levelNum);
 }
 
 // Actually start the game (after overlay is dismissed or on desktop)
 function actuallyStartGame(levelNum) {
     console.log(`Actually starting game at level: ${levelNum}`);
-    
+
     // --- MOBILE/TABLET CONTROL VISIBILITY ---
     const leftControls = document.querySelector('.left-controls');
     const onscreenControls = document.querySelector('.onscreen-controls');
     const isMobileOrTablet = window.innerWidth <= 1400; // Include tablets up to 1200px
-    
+
     if (isMobileOrTablet) {
         if (leftControls) leftControls.classList.add('hide-on-mobile-game');
         if (onscreenControls) {
@@ -89,123 +90,52 @@ function actuallyStartGame(levelNum) {
             onscreenControls.classList.remove('active');
         }
     }
-// Show a victory animation and play happy music after level 10
-function showVictoryAnimation() {
-    stopAllSounds();
-    if (soundEnabled) {
-        try {
-            victoryMusic.currentTime = 0;
-            victoryMusic.play().catch(e => {
-                console.log('Victory music play prevented:', e);
+
+    // Simple confetti animation
+    function drawConfetti(canvas) {
+        const ctx = canvas.getContext('2d');
+        const confettiCount = 120;
+        const confetti = [];
+        for (let i = 0; i < confettiCount; i++) {
+            confetti.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * -canvas.height,
+                r: 6 + Math.random() * 8,
+                d: Math.random() * 100,
+                color: `hsl(${Math.random() * 360}, 90%, 60%)`,
+                tilt: Math.random() * 10 - 5,
+                tiltAngle: 0,
+                tiltAngleIncremental: (Math.random() * 0.07) + 0.05
             });
-        } catch (e) {
-            console.log('Victory music error:', e);
         }
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            confetti.forEach(c => {
+                ctx.beginPath();
+                ctx.lineWidth = c.r;
+                ctx.strokeStyle = c.color;
+                ctx.moveTo(c.x + c.tilt + c.r / 3, c.y);
+                ctx.lineTo(c.x + c.tilt, c.y + c.r);
+                ctx.stroke();
+            });
+            update();
+            requestAnimationFrame(draw);
+        }
+        function update() {
+            confetti.forEach(c => {
+                c.y += (Math.cos(c.d) + 3 + c.r / 2) / 2;
+                c.x += Math.sin(0.01 * c.d);
+                c.tiltAngle += c.tiltAngleIncremental;
+                c.tilt = Math.sin(c.tiltAngle) * 15;
+                if (c.y > canvas.height) {
+                    c.x = Math.random() * canvas.width;
+                    c.y = -10;
+                }
+            });
+        }
+        draw();
     }
-    // Fade out the canvas and show a big message
-    const overlay = document.createElement('div');
-    overlay.style.position = 'fixed';
-    overlay.style.top = '0';
-    overlay.style.left = '0';
-    overlay.style.width = '100vw';
-    overlay.style.height = '100vh';
-    overlay.style.background = 'rgba(0,0,0,0.95)';
-    overlay.style.display = 'flex';
-    overlay.style.flexDirection = 'column';
-    overlay.style.justifyContent = 'center';
-    overlay.style.alignItems = 'center';
-    overlay.style.zIndex = '99999';
-    overlay.style.transition = 'opacity 1s';
-    overlay.style.opacity = '0';
-    document.body.appendChild(overlay);
-    setTimeout(() => { overlay.style.opacity = '1'; }, 10);
 
-    // Add animated text
-    const msg = document.createElement('h1');
-    msg.textContent = 'You finished the game!';
-    msg.style.color = '#FFD700';
-    msg.style.fontSize = '3rem';
-    msg.style.textShadow = '0 0 20px #ED6509, 0 0 40px #fff';
-    msg.style.marginBottom = '30px';
-    overlay.appendChild(msg);
-
-    // Add a confetti effect (simple canvas)
-    const confettiCanvas = document.createElement('canvas');
-    confettiCanvas.width = window.innerWidth;
-    confettiCanvas.height = window.innerHeight;
-    confettiCanvas.style.position = 'absolute';
-    confettiCanvas.style.top = '0';
-    confettiCanvas.style.left = '0';
-    overlay.appendChild(confettiCanvas);
-    drawConfetti(confettiCanvas);
-
-    // Add a restart button
-    const restartBtn = document.createElement('button');
-    restartBtn.textContent = 'Play Again';
-    restartBtn.style.background = '#ED6509';
-    restartBtn.style.color = '#fff';
-    restartBtn.style.fontSize = '1.5rem';
-    restartBtn.style.padding = '16px 40px';
-    restartBtn.style.border = 'none';
-    restartBtn.style.borderRadius = '10px';
-    restartBtn.style.marginTop = '40px';
-    restartBtn.style.cursor = 'pointer';
-    restartBtn.style.boxShadow = '0 0 20px #ED6509';
-    restartBtn.addEventListener('click', () => {
-        overlay.remove();
-        victoryMusic.pause();
-        victoryMusic.currentTime = 0;
-        localStorage.setItem('trustIssuesLevel', 1);
-        startGame(1);
-    });
-    overlay.appendChild(restartBtn);
-}
-
-// Simple confetti animation
-function drawConfetti(canvas) {
-    const ctx = canvas.getContext('2d');
-    const confettiCount = 120;
-    const confetti = [];
-    for (let i = 0; i < confettiCount; i++) {
-        confetti.push({
-            x: Math.random() * canvas.width,
-            y: Math.random() * -canvas.height,
-            r: 6 + Math.random() * 8,
-            d: Math.random() * 100,
-            color: `hsl(${Math.random() * 360}, 90%, 60%)`,
-            tilt: Math.random() * 10 - 5,
-            tiltAngle: 0,
-            tiltAngleIncremental: (Math.random() * 0.07) + 0.05
-        });
-    }
-    function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        confetti.forEach(c => {
-            ctx.beginPath();
-            ctx.lineWidth = c.r;
-            ctx.strokeStyle = c.color;
-            ctx.moveTo(c.x + c.tilt + c.r / 3, c.y);
-            ctx.lineTo(c.x + c.tilt, c.y + c.r);
-            ctx.stroke();
-        });
-        update();
-        requestAnimationFrame(draw);
-    }
-    function update() {
-        confetti.forEach(c => {
-            c.y += (Math.cos(c.d) + 3 + c.r / 2) / 2;
-            c.x += Math.sin(0.01 * c.d);
-            c.tiltAngle += c.tiltAngleIncremental;
-            c.tilt = Math.sin(c.tiltAngle) * 15;
-            if (c.y > canvas.height) {
-                c.x = Math.random() * canvas.width;
-                c.y = -10;
-            }
-        });
-    }
-    draw();
-}
-    
     // Hide the start screen
     const startScreen = document.getElementById('start-screen');
     if (startScreen) {
@@ -228,13 +158,13 @@ function drawConfetti(canvas) {
     }
     // Show the game canvas
     canvas.style.display = 'block';
-    
+
     // Add game-active class to show black background
     const gameContainer = document.querySelector('.game-container');
     if (gameContainer) {
         gameContainer.classList.add('game-active');
     }
-    
+
     lives = 5;
     // Load the specified level
     loadLevel(levelNum);
@@ -254,21 +184,21 @@ function loadLevel(levelNum) {
         clearTimeout(level9DisappearTimeout);
         level9DisappearTimeout = null;
     }
-    
+
     // Reset level 8 wall timer state
     level8WallTimerStarted = false;
     if (level8WallTimeout) {
         clearTimeout(level8WallTimeout);
         level8WallTimeout = null;
     }
-    
+
     // Reset level 10 dots timer state
     level10DotsTimerStarted = false;
     if (level10DotsTimeout) {
         clearTimeout(level10DotsTimeout);
         level10DotsTimeout = null;
     }
-    
+
     // Clear level 5 spike timers/intervals to prevent leftover spikes
     if (typeof level5SpikeTimeout !== 'undefined' && level5SpikeTimeout) {
         clearTimeout(level5SpikeTimeout);
@@ -417,10 +347,10 @@ function showGameCompletionAnimation() {
             console.log('Victory music error:', e);
         }
     }
-    
+
     // Get canvas position and size
     const canvasRect = canvas.getBoundingClientRect();
-    
+
     // Create overlay positioned over the game canvas
     const overlay = document.createElement('div');
     overlay.className = 'victory-overlay';
@@ -480,7 +410,7 @@ function drawWinConfetti(canvas) {
     const ctx = canvas.getContext('2d');
     const confettiCount = 80;
     const confetti = [];
-    
+
     // Create confetti pieces
     for (let i = 0; i < confettiCount; i++) {
         confetti.push({
@@ -496,17 +426,17 @@ function drawWinConfetti(canvas) {
             gravity: 0.1
         });
     }
-    
+
     function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
+
         confetti.forEach(piece => {
             // Update position
             piece.x += piece.vx;
             piece.y += piece.vy;
             piece.vy += piece.gravity;
             piece.rotation += piece.rotationSpeed;
-            
+
             // Reset if off screen
             if (piece.y > canvas.height) {
                 piece.y = -20;
@@ -515,19 +445,19 @@ function drawWinConfetti(canvas) {
             }
             if (piece.x > canvas.width) piece.x = 0;
             if (piece.x < 0) piece.x = canvas.width;
-            
+
             // Draw confetti piece
             ctx.save();
-            ctx.translate(piece.x + piece.w/2, piece.y + piece.h/2);
+            ctx.translate(piece.x + piece.w / 2, piece.y + piece.h / 2);
             ctx.rotate((piece.rotation * Math.PI) / 180);
             ctx.fillStyle = piece.color;
-            ctx.fillRect(-piece.w/2, -piece.h/2, piece.w, piece.h);
+            ctx.fillRect(-piece.w / 2, -piece.h / 2, piece.w, piece.h);
             ctx.restore();
         });
-        
+
         requestAnimationFrame(animate);
     }
-    
+
     animate();
 }
 
@@ -553,7 +483,7 @@ function update() {
             }
         });
     }
-    
+
     // Level 7: Trigger spike after player moves 
     if (currentLevel === 7 && !level7SpikeTimerStarted) {
         if (player.dx !== 0 || player.dy !== 0) {
@@ -578,7 +508,7 @@ function update() {
             }
         }
     }
-    
+
     //Level 8: Trigger moving wall after player moves 
     if (currentLevel === 8 && !level8WallTimerStarted) {
         if (player.dx !== 0 || player.dy !== 0) {
@@ -594,7 +524,7 @@ function update() {
             }
         }
     }
-    
+
     // Level 9: Trigger disappearing floor after player moves
     if (currentLevel === 9 && !level9DisappearTimerStarted) {
         if (player.dx !== 0 || player.dy !== 0) {
@@ -610,7 +540,7 @@ function update() {
             }
         }
     }
-    
+
     // Level 10: Start moving dots after 4 seconds
     if (currentLevel === 10 && !level10DotsTimerStarted) {
         level10DotsTimerStarted = true;
@@ -622,7 +552,7 @@ function update() {
             });
         }, 4000);
     }
-    
+
     if (gamePaused) return;
     if (keys['ArrowLeft']) player.dx = -3;
     else if (keys['ArrowRight']) player.dx = 3;
@@ -741,7 +671,7 @@ function update() {
             // If hole is revealed and speed is zero, keep it visible
             // No movement, just ensure it's drawn
         }
-    if (t.type === "moving_spikes") {
+        if (t.type === "moving_spikes") {
             // For level 7, only move if not hidden
             if (t.hidden) return;
             // If triggerDistance is set, only move if player is close
@@ -754,7 +684,7 @@ function update() {
                 t.x += t.movement.direction === "left" ? -t.movement.speed : t.movement.speed;
             }
         }
-        
+
         // Move movingDot traps (Level 10)
         if (t.type === "movingDot" && t.moving) {
             if (t.direction === "right") {
@@ -792,9 +722,9 @@ function update() {
         goalReached = true;
         // Play win sound when reaching goal
         playSound(winSound);
-    // Move player into the center of the door
-    player.x = goal.x + (goal.width - player.width) / 2;
-    player.y = goal.y + (goal.height - player.height) / 2;
+        // Move player into the center of the door
+        player.x = goal.x + (goal.width - player.width) / 2;
+        player.y = goal.y + (goal.height - player.height) / 2;
         // Only save progress if not on the final level
         if (currentLevel < 10) {
             localStorage.setItem('trustIssuesLevel', currentLevel + 1);
@@ -820,7 +750,7 @@ function handleCanvasTouch(e) {
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
     let clientX, clientY;
-    
+
     if (e.touches && e.touches.length > 0) {
         clientX = e.touches[0].clientX;
         clientY = e.touches[0].clientY;
@@ -828,7 +758,7 @@ function handleCanvasTouch(e) {
         clientX = e.clientX;
         clientY = e.clientY;
     }
-    
+
     const x = (clientX - rect.left) * scaleX;
     const y = (clientY - rect.top) * scaleY;
 
@@ -880,7 +810,7 @@ function drawPlayer(ctx, player) {
 
     // Calculate center of the player
     const centerX = x + width / 2;
-    
+
     // Use player movement direction to determine animation
     const isMoving = player.dx !== 0;
     const direction = player.dx > 0 ? 1 : -1;
@@ -906,11 +836,11 @@ function drawPlayer(ctx, player) {
     if (isMoving) {
         // Running arm animation
         const armSwing = Math.sin(frameCounter / 5) * 20;
-        
+
         // Forward arm
         ctx.moveTo(centerX, y + height * 0.5);
         ctx.lineTo(centerX + (armSwing * direction), y + height * 0.6);
-        
+
         // Backward arm
         ctx.moveTo(centerX, y + height * 0.5);
         ctx.lineTo(centerX - (armSwing * direction), y + height * 0.6);
@@ -918,7 +848,7 @@ function drawPlayer(ctx, player) {
         // Standing position
         ctx.moveTo(centerX, y + height * 0.5);
         ctx.lineTo(centerX - width * 0.3, y + height * 0.6);
-        
+
         ctx.moveTo(centerX, y + height * 0.5);
         ctx.lineTo(centerX + width * 0.3, y + height * 0.6);
     }
@@ -930,11 +860,11 @@ function drawPlayer(ctx, player) {
     if (isMoving || !player.onGround) {
         // Running or jumping leg animation
         const legSwing = Math.cos(frameCounter / 5) * 20;
-        
+
         // Forward leg
         ctx.moveTo(centerX, y + height * 0.8);
         ctx.lineTo(centerX + (legSwing * direction), y + height);
-        
+
         // Backward leg
         ctx.moveTo(centerX, y + height * 0.8);
         ctx.lineTo(centerX - (legSwing * direction), y + height);
@@ -942,7 +872,7 @@ function drawPlayer(ctx, player) {
         // Standing position
         ctx.moveTo(centerX, y + height * 0.8);
         ctx.lineTo(centerX - width * 0.2, y + height);
-        
+
         ctx.moveTo(centerX, y + height * 0.8);
         ctx.lineTo(centerX + width * 0.2, y + height);
     }
@@ -1083,24 +1013,24 @@ function draw() {
 // Modal handling
 function showWinModal(callback) {
     console.log("Showing win modal");
-    
+
     // First, clean up any existing modal backdrops
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
     document.body.classList.remove('modal-open');
     document.body.style.overflow = '';
     document.body.style.paddingRight = '';
-    
+
     const winModalEl = document.getElementById('winModal');
-    
+
     // Completely remove any previous click handlers from the continue button
     const continueBtn = document.getElementById('continueBtn');
     const newBtn = continueBtn.cloneNode(true);
     continueBtn.parentNode.replaceChild(newBtn, continueBtn);
-    
+
     // Add new click handler to the button
-    newBtn.addEventListener('click', function() {
+    newBtn.addEventListener('click', function () {
         console.log("Continue button clicked");
-        
+
         // Manual modal cleanup
         winModalEl.classList.remove('show');
         winModalEl.style.display = 'none';
@@ -1108,7 +1038,7 @@ function showWinModal(callback) {
         document.body.classList.remove('modal-open');
         document.body.style.overflow = '';
         document.body.style.paddingRight = '';
-        
+
         // Execute callback after modal is closed
         setTimeout(() => {
             if (typeof callback === 'function') {
@@ -1117,7 +1047,7 @@ function showWinModal(callback) {
             }
         }, 100);
     });
-    
+
     // Show the modal using Bootstrap
     const winModal = new bootstrap.Modal(winModalEl);
     winModal.show();
@@ -1125,33 +1055,33 @@ function showWinModal(callback) {
 
 function createWinModal() {
     const winModalEl = document.getElementById('winModal');
-    
+
     // Create modal content if it doesn't exist
     if (!winModalEl.querySelector('.modal-dialog')) {
         // Create modal structure
         const modalDialog = document.createElement('div');
         modalDialog.className = 'modal-dialog modal-dialog-centered';
-        
+
         const modalContent = document.createElement('div');
         modalContent.className = 'modal-content bg-dark text-light';
-        
+
         const modalHeader = document.createElement('div');
         modalHeader.className = 'modal-header';
         modalHeader.innerHTML = '<h5 class="modal-title">Level Complete!</h5>';
-        
+
         const modalBody = document.createElement('div');
         modalBody.className = 'modal-body';
         modalBody.innerHTML = '<p>Congratulations! You finished the level.</p>';
-        
+
         const modalFooter = document.createElement('div');
         modalFooter.className = 'modal-footer';
-        
+
         const continueBtn = document.createElement('button');
         continueBtn.id = 'continueBtn';
         continueBtn.className = 'btn btn-success';
         continueBtn.textContent = 'Continue';
         continueBtn.setAttribute('data-bs-dismiss', 'modal');
-        
+
         modalFooter.appendChild(continueBtn);
         modalContent.appendChild(modalHeader);
         modalContent.appendChild(modalBody);
@@ -1180,19 +1110,14 @@ document.addEventListener('keydown', e => {
         showRestartMessage = false;
         explosionTimer = 0;
         respawnAnimation = true;
-        movementLocked = true;
-        canMove = false;
-
         // Instead of manually resetting player and traps, reload the level:
         loadLevel(currentLevel);
 
         setTimeout(() => {
             respawnAnimation = false;
-            movementLocked = false;
             player.dx = 0;
             player.dy = 0;
             keys = {};
-            canMove = true;
         }, 1000);
         return;
     }
@@ -1248,7 +1173,7 @@ document.addEventListener('DOMContentLoaded', () => {
             controls.style.display = 'none';
         }
     }, 0);
-    
+
     // Level select menu logic
     const levelSelect = document.getElementById('levelSelect');
     const mainStartButton = document.getElementById('mainStartButton');
@@ -1334,22 +1259,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnRight = document.getElementById('btnRight');
     const btnJump = document.getElementById('btnJump');
     const btnPause = document.getElementById('btnPause');
-    
+
     // Helper to trigger key events for game logic
     function triggerKey(code, pressed) {
         keys[code] = pressed;
     }
-    
+
     if (btnLeft && btnRight && btnJump) {
-    // Touch events for left
-    btnLeft.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('ArrowLeft', true); });
-    btnLeft.addEventListener('touchend', e => { e.preventDefault(); triggerKey('ArrowLeft', false); });
-    // Touch events for right
-    btnRight.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('ArrowRight', true); });
-    btnRight.addEventListener('touchend', e => { e.preventDefault(); triggerKey('ArrowRight', false); });
-    // Touch events for jump (space)
-    btnJump.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('Space', true); });
-    btnJump.addEventListener('touchend', e => { e.preventDefault(); triggerKey('Space', false); });
+        // Touch events for left
+        btnLeft.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('ArrowLeft', true); });
+        btnLeft.addEventListener('touchend', e => { e.preventDefault(); triggerKey('ArrowLeft', false); });
+        // Touch events for right
+        btnRight.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('ArrowRight', true); });
+        btnRight.addEventListener('touchend', e => { e.preventDefault(); triggerKey('ArrowRight', false); });
+        // Touch events for jump (space)
+        btnJump.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('Space', true); });
+        btnJump.addEventListener('touchend', e => { e.preventDefault(); triggerKey('Space', false); });
         // Mouse fallback for desktop testing
         btnLeft.addEventListener('mousedown', e => { e.preventDefault(); triggerKey('ArrowLeft', true); });
         btnLeft.addEventListener('mouseup', e => { e.preventDefault(); triggerKey('ArrowLeft', false); });
@@ -1358,18 +1283,18 @@ document.addEventListener('DOMContentLoaded', () => {
         btnJump.addEventListener('mousedown', e => { e.preventDefault(); triggerKey('Space', true); });
         btnJump.addEventListener('mouseup', e => { e.preventDefault(); triggerKey('Space', false); });
     }
-    
+
     // Pause button for mobile
     if (btnPause) {
-        btnPause.addEventListener('touchstart', e => { 
-            e.preventDefault(); 
+        btnPause.addEventListener('touchstart', e => {
+            e.preventDefault();
             e.stopPropagation();
             console.log('Pause button touched');
             gamePaused = true;
             showPausePopup();
         });
-        btnPause.addEventListener('click', e => { 
-            e.preventDefault(); 
+        btnPause.addEventListener('click', e => {
+            e.preventDefault();
             e.stopPropagation();
             console.log('Pause button clicked');
             gamePaused = true;
@@ -1427,42 +1352,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const resetPopup = document.getElementById('resetPopup');
     const resetBtn = document.getElementById('resetBtn');
     if (resetBtn) {
-        resetBtn.addEventListener('click', function() {
+        resetBtn.addEventListener('click', function () {
             showResetPopup = false;
             lives = 5;
             playerDead = false;
             explosionTimer = 0;
             showRestartMessage = false;
             respawnAnimation = false;
-            movementLocked = false;
-            canMove = true;
             loadLevel(currentLevel);
             if (resetPopup) resetPopup.classList.add('hidden');
         });
     }
 
     if (exitBtn) {
-        exitBtn.addEventListener('click', function() {
+        exitBtn.addEventListener('click', function () {
             pausePopup.classList.add('hidden');
             location.reload(); // Reloads the page to exit
         });
     }
     if (replayBtn) {
-        replayBtn.addEventListener('click', function() {
+        replayBtn.addEventListener('click', function () {
             pausePopup.classList.add('hidden');
             loadLevel(currentLevel); // Restarts the current level
         });
     }
     if (playBtn) {
-        playBtn.addEventListener('click', function() {
+        playBtn.addEventListener('click', function () {
             pausePopup.classList.add('hidden');
             gamePaused = false; // Resumes the game
-            
+
             // Restore mobile/tablet controls when resuming
             const isMobileOrTablet = window.innerWidth <= 1200; // Include tablets up to 1200px
             const leftControls = document.querySelector('.left-controls');
             const onscreenControls = document.querySelector('.onscreen-controls');
-            
+
             if (isMobileOrTablet) {
                 if (leftControls) leftControls.classList.add('hide-on-mobile-game');
                 if (onscreenControls) onscreenControls.classList.add('active');
@@ -1478,9 +1401,9 @@ function showPausePopup() {
     const leftControls = document.querySelector('.left-controls');
     const onscreenControls = document.querySelector('.onscreen-controls');
     const pausePopup = document.getElementById('pausePopup');
-    
+
     console.log('pausePopup element:', pausePopup);
-    
+
     // Show pause popup
     if (pausePopup) {
         pausePopup.classList.remove('hidden');
@@ -1488,7 +1411,7 @@ function showPausePopup() {
     } else {
         console.log('pausePopup element not found!');
     }
-    
+
     // Keep mobile/tablet controls visible but make pause popup accessible
     if (window.innerWidth <= 1200) { // Include tablets up to 1200px
         if (leftControls) leftControls.classList.add('hide-on-mobile-game');
@@ -1542,8 +1465,7 @@ function fallingThroughLayersTransition(callback) {
     ];
 
     let playerY = 0; // Start falling from the top
-    const fallSpeed = 5
-    ; // Speed of falling
+    const fallSpeed = 5; // Speed of falling
     const layerHeight = canvas.height / layers.length; // Height of each layer
 
     const animationInterval = setInterval(() => {
@@ -1648,7 +1570,7 @@ function drawDeathAnimation(ctx, player, explosionTimer) {
         }
     }
     // Animate pieces
-    deathPieces.forEach(piece => {
+    deathPieces.forEach((piece) => {
         piece.x += piece.dx;
         piece.y += piece.dy;
         piece.opacity -= 0.025;
@@ -1673,15 +1595,16 @@ function drawRespawnAnimation(ctx, player) {
             const px = Math.random() * canvas.width;
             const py = Math.random() * canvas.height;
             deathPieces.push({
-                x: px, y: py,
+                x: px,
+                y: py,
                 targetX: player.x + Math.random() * player.width,
                 targetY: player.y + Math.random() * player.height,
-                opacity: 1
+                opacity: 1,
             });
         }
     }
     let allArrived = true;
-    deathPieces.forEach(piece => {
+    deathPieces.forEach((piece) => {
         // Move towards target
         piece.x += (piece.targetX - piece.x) * 0.2;
         piece.y += (piece.targetY - piece.y) * 0.2;
@@ -1708,16 +1631,12 @@ function handleCanvasRestart(e) {
         showRestartMessage = false;
         explosionTimer = 0;
         respawnAnimation = true;
-        movementLocked = true;
-        canMove = false;
         loadLevel(currentLevel);
         setTimeout(() => {
             respawnAnimation = false;
-            movementLocked = false;
             player.dx = 0;
             player.dy = 0;
             keys = {};
-            canMove = true;
         }, 1000);
     }
 }
