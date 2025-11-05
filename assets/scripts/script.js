@@ -212,7 +212,7 @@ function loadLevel(levelNum) {
     goalReached = false;
     currentLevel = levelNum;
     console.log(`Loading level: ${levelNum}`); // Debugging log
-    fetch(`levels/level${levelNum}.json`)
+    fetch(`assets/scripts/levels/level${levelNum}.json`)
         .then(res => res.json())
         .then(data => {
             console.log('Level data:', data); // Debugging log
