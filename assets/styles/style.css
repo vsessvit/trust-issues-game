@@ -375,7 +375,7 @@ html, body {
 body {
     margin: 0;
     padding: 0;
-    background-image: url('assets/images/HomepageBackground.JPG');
+    background-image: url('../images/HomepageBackground.JPG');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
