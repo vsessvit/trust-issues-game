@@ -65,7 +65,7 @@ function getSavedLevel() {
 
 // Start game logic
 function startGame(levelNum) {
-    console.log(`Starting game at level: ${levelNum}`);
+
 
     // Start game directly for all devices (desktop and mobile)
     actuallyStartGame(levelNum);
@@ -73,7 +73,7 @@ function startGame(levelNum) {
 
 // Actually start the game (after overlay is dismissed or on desktop)
 function actuallyStartGame(levelNum) {
-    console.log(`Actually starting game at level: ${levelNum}`);
+
 
     // --- MOBILE/TABLET CONTROL VISIBILITY ---
     const leftControls = document.querySelector('.left-controls');
@@ -211,11 +211,11 @@ function loadLevel(levelNum) {
     }
     goalReached = false;
     currentLevel = levelNum;
-    console.log(`Loading level: ${levelNum}`); // Debugging log
+
     fetch(`assets/scripts/levels/level${levelNum}.json`)
         .then(res => res.json())
         .then(data => {
-            console.log('Level data:', data); // Debugging log
+
             currentLevel = levelNum;
             levelData = data;
             platforms = data.platforms || [];
@@ -342,10 +342,10 @@ function showGameCompletionAnimation() {
         try {
             victoryMusic.currentTime = 0;
             victoryMusic.play().catch(e => {
-                console.log('Victory music play prevented:', e);
+
             });
         } catch (e) {
-            console.log('Victory music error:', e);
+
         }
     }
 
@@ -791,10 +791,10 @@ function playSound(sound) {
         sound.currentTime = 0;
         sound.play().catch(e => {
             // Handle autoplay restrictions silently
-            console.log('Audio play prevented:', e);
+
         });
     } catch (e) {
-        console.log('Audio error:', e);
+
     }
 }
 
@@ -1013,7 +1013,7 @@ function draw() {
 
 // Modal handling
 function showWinModal(callback) {
-    console.log("Showing win modal");
+
 
     // First, clean up any existing modal backdrops
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
@@ -1030,7 +1030,7 @@ function showWinModal(callback) {
 
     // Add new click handler to the button
     newBtn.addEventListener('click', function () {
-        console.log("Continue button clicked");
+
 
         // Manual modal cleanup
         winModalEl.classList.remove('show');
@@ -1043,7 +1043,7 @@ function showWinModal(callback) {
         // Execute callback after modal is closed
         setTimeout(() => {
             if (typeof callback === 'function') {
-                console.log("Loading next level");
+
                 callback();
             }
         }, 100);
@@ -1290,19 +1290,19 @@ document.addEventListener('DOMContentLoaded', () => {
         btnPause.addEventListener('touchstart', e => {
             e.preventDefault();
             e.stopPropagation();
-            console.log('Pause button touched');
+
             gamePaused = true;
             showPausePopup();
         });
         btnPause.addEventListener('click', e => {
             e.preventDefault();
             e.stopPropagation();
-            console.log('Pause button clicked');
+
             gamePaused = true;
             showPausePopup();
         });
     } else {
-        console.log('btnPause element not found');
+
     }
 
     // Sound toggle
@@ -1398,19 +1398,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- Ensure controls update on pause/game end ---
 function showPausePopup() {
-    console.log('showPausePopup called');
+
     const leftControls = document.querySelector('.left-controls');
     const onscreenControls = document.querySelector('.onscreen-controls');
     const pausePopup = document.getElementById('pausePopup');
 
-    console.log('pausePopup element:', pausePopup);
+
 
     // Show pause popup
     if (pausePopup) {
         pausePopup.classList.remove('hidden');
-        console.log('Removed hidden class from pause popup');
+
     } else {
-        console.log('pausePopup element not found!');
+
     }
 
     // Keep mobile/tablet controls visible but make pause popup accessible
