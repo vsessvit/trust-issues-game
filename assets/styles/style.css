@@ -746,8 +746,15 @@ footer {
         visibility: visible;
     }
 
+    .game-container.game-active .onscreen-controls.active {
+        display: flex !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        visibility: visible !important;
+    }
+
     body {
-        background-image: url('assets/images/HomepageBackgroundMobile.jpg');
+        background-image: url('../images/HomepageBackgroundMobile.jpg');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -757,7 +764,7 @@ footer {
     }
 
     #start-screen {
-        background-image: url('assets/images/HomepageBackgroundMobile.jpg');
+        background-image: url('../images/HomepageBackgroundMobile.jpg');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -885,16 +892,17 @@ footer {
         overflow-x: hidden;
     }
 
+
     body .onscreen-controls {
         display: none;
         opacity: 0;
         pointer-events: none;
     }
 
-    body .onscreen-controls.active {
-        display: flex;
-        opacity: 1;
-        pointer-events: auto;
+    .game-container.game-active .onscreen-controls.active {
+        display: flex !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
     }
 
     html,
@@ -907,7 +915,7 @@ footer {
     }
 
     body {
-        background-image: url('assets/images/HomepageBackgroundMobile.jpg');
+        background-image: url('../images/HomepageBackgroundMobile.jpg');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -1008,10 +1016,10 @@ footer {
     }
 
     canvas#gameCanvas {
-        display: block;
+        display: none;
         width: 100vw;
         height: calc(100vw * 550 / 910);
-        max-width: 600px;
+        max-width: 700px;
         max-height: 360px;
         aspect-ratio: 910 / 550;
         background: var(--background-black);
@@ -1023,6 +1031,11 @@ footer {
         z-index: 100;
         margin: 0;
         overflow: hidden;
+    }
+
+    .game-container.game-active canvas#gameCanvas,
+    canvas#gameCanvas.game-active {
+        display: block;
     }
 
     body .onscreen-controls {
@@ -1107,7 +1120,7 @@ footer {
         visibility: hidden;
         position: absolute;
         left: 50%;
-        top: calc(50% + 300px);
+        top: calc(50% + 275px);
         transform: translateX(-50%);
         z-index: 9999;
     }
@@ -1119,7 +1132,7 @@ footer {
         visibility: visible;
         position: absolute;
         left: 50%;
-        top: calc(50% + 300px);
+        top: calc(50% + 275px);
         transform: translateX(-50%);
         z-index: 9999;
         width: 80vw;
@@ -1130,6 +1143,13 @@ footer {
         justify-content: space-between;
         align-items: flex-end;
         padding: 20px 30px;
+    }
+
+    .game-container.game-active .onscreen-controls.active {
+        display: flex !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        visibility: visible !important;
     }
 
     .onscreen-left-group,
@@ -1176,6 +1196,11 @@ footer {
     .left-controls.hide-on-mobile-game {
         display: none;
     }
+
+    .game-container {
+        padding: 0;
+        margin-top: -50px;
+    }
 }
 
 /* Phone landscape - smaller canvas with onscreen controls */
@@ -1205,6 +1230,13 @@ footer {
         justify-content: space-between;
         align-items: flex-end;
         padding: 15px 25px;
+    }
+
+    .game-container.game-active .onscreen-controls.active {
+        display: flex !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        visibility: visible !important;
     }
 
     .onscreen-left-group,

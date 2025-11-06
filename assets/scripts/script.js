@@ -780,7 +780,7 @@ function handleCanvasTouch(e) {
 }
 
 canvas.addEventListener('click', handleCanvasTouch);
-canvas.addEventListener('touchstart', handleCanvasTouch, { passive: true });
+canvas.addEventListener('touchstart', handleCanvasTouch, { passive: false });
 
 let soundEnabled = true;
 
@@ -1268,14 +1268,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnLeft && btnRight && btnJump) {
         // Touch events for left
-        btnLeft.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('ArrowLeft', true); });
-        btnLeft.addEventListener('touchend', e => { e.preventDefault(); triggerKey('ArrowLeft', false); });
+        btnLeft.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('ArrowLeft', true); }, { passive: false });
+        btnLeft.addEventListener('touchend', e => { e.preventDefault(); triggerKey('ArrowLeft', false); }, { passive: false });
         // Touch events for right
-        btnRight.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('ArrowRight', true); });
-        btnRight.addEventListener('touchend', e => { e.preventDefault(); triggerKey('ArrowRight', false); });
+        btnRight.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('ArrowRight', true); }, { passive: false });
+        btnRight.addEventListener('touchend', e => { e.preventDefault(); triggerKey('ArrowRight', false); }, { passive: false });
         // Touch events for jump (space)
-        btnJump.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('Space', true); });
-        btnJump.addEventListener('touchend', e => { e.preventDefault(); triggerKey('Space', false); });
+        btnJump.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('Space', true); }, { passive: false });
+        btnJump.addEventListener('touchend', e => { e.preventDefault(); triggerKey('Space', false); }, { passive: false });
         // Mouse fallback for desktop testing
         btnLeft.addEventListener('mousedown', e => { e.preventDefault(); triggerKey('ArrowLeft', true); });
         btnLeft.addEventListener('mouseup', e => { e.preventDefault(); triggerKey('ArrowLeft', false); });
@@ -1642,4 +1642,4 @@ function handleCanvasRestart(e) {
     }
 }
 canvas.addEventListener('click', handleCanvasRestart);
-canvas.addEventListener('touchstart', handleCanvasRestart, { passive: true });
+canvas.addEventListener('touchstart', handleCanvasRestart, { passive: false });
