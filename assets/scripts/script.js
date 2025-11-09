@@ -55,7 +55,6 @@ const winSound = new Audio('assets/sounds/win.wav');
 const deathSound = new Audio('assets/sounds/death.wav');
 
 let frameCounter = 0;
-const frameSpeed = 5;
 
 // Utility to get saved level
 function getSavedLevel() {
@@ -73,8 +72,6 @@ function startGame(levelNum) {
 
 // Actually start the game (after overlay is dismissed or on desktop)
 function actuallyStartGame(levelNum) {
-
-
     // --- MOBILE/TABLET CONTROL VISIBILITY ---
     const leftControls = document.querySelector('.left-controls');
     const onscreenControls = document.querySelector('.onscreen-controls');
@@ -90,51 +87,6 @@ function actuallyStartGame(levelNum) {
         if (onscreenControls) {
             onscreenControls.classList.remove('active');
         }
-    }
-
-    // Simple confetti animation
-    function drawConfetti(canvas) {
-        const ctx = canvas.getContext('2d');
-        const confettiCount = 120;
-        const confetti = [];
-        for (let i = 0; i < confettiCount; i++) {
-            confetti.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * -canvas.height,
-                r: 6 + Math.random() * 8,
-                d: Math.random() * 100,
-                color: `hsl(${Math.random() * 360}, 90%, 60%)`,
-                tilt: Math.random() * 10 - 5,
-                tiltAngle: 0,
-                tiltAngleIncremental: (Math.random() * 0.07) + 0.05
-            });
-        }
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            confetti.forEach(c => {
-                ctx.beginPath();
-                ctx.lineWidth = c.r;
-                ctx.strokeStyle = c.color;
-                ctx.moveTo(c.x + c.tilt + c.r / 3, c.y);
-                ctx.lineTo(c.x + c.tilt, c.y + c.r);
-                ctx.stroke();
-            });
-            update();
-            requestAnimationFrame(draw);
-        }
-        function update() {
-            confetti.forEach(c => {
-                c.y += (Math.cos(c.d) + 3 + c.r / 2) / 2;
-                c.x += Math.sin(0.01 * c.d);
-                c.tiltAngle += c.tiltAngleIncremental;
-                c.tilt = Math.sin(c.tiltAngle) * 15;
-                if (c.y > canvas.height) {
-                    c.x = Math.random() * canvas.width;
-                    c.y = -10;
-                }
-            });
-        }
-        draw();
     }
 
     // Hide the start screen
@@ -338,16 +290,7 @@ function onPlayerReachGoal() {
 // Game completion animation for level 10
 function showGameCompletionAnimation() {
     stopAllSounds();
-    if (soundEnabled) {
-        try {
-            victoryMusic.currentTime = 0;
-            victoryMusic.play().catch(e => {
-
-            });
-        } catch (e) {
-
-        }
-    }
+    playSound(victoryMusic);
 
     // Get canvas position and size
     const canvasRect = canvas.getBoundingClientRect();
@@ -497,9 +440,6 @@ function update() {
                         spike.hidden = false;
                         // If spike moves right, schedule direction reversal after 3 seconds
                         if (spike.movement && spike.movement.direction === "right") {
-                            // Use a longer delay for the second spike
-                            let reverseDelay = 3000;
-                            if (spike.x > 800) reverseDelay = 6000;
                             setTimeout(() => {
                                 spike.movement.direction = "left";
                             }, 6000);
@@ -786,16 +726,12 @@ let soundEnabled = true;
 
 function playSound(sound) {
     if (!soundEnabled) return;
-    try {
-        // Always reset to start
-        sound.currentTime = 0;
-        sound.play().catch(e => {
-            // Handle autoplay restrictions silently
 
-        });
-    } catch (e) {
-
-    }
+    // Always reset to start
+    sound.currentTime = 0;
+    sound.play().catch(() => {
+        // Handle autoplay restrictions silently
+    });
 }
 
 function stopAllSounds() {
@@ -1011,87 +947,6 @@ function draw() {
     frameCounter++;
 }
 
-// Modal handling
-function showWinModal(callback) {
-
-
-    // First, clean up any existing modal backdrops
-    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-    document.body.classList.remove('modal-open');
-    document.body.style.overflow = '';
-    document.body.style.paddingRight = '';
-
-    const winModalEl = document.getElementById('winModal');
-
-    // Completely remove any previous click handlers from the continue button
-    const continueBtn = document.getElementById('continueBtn');
-    const newBtn = continueBtn.cloneNode(true);
-    continueBtn.parentNode.replaceChild(newBtn, continueBtn);
-
-    // Add new click handler to the button
-    newBtn.addEventListener('click', function () {
-
-
-        // Manual modal cleanup
-        winModalEl.classList.remove('show');
-        winModalEl.style.display = 'none';
-        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-        document.body.classList.remove('modal-open');
-        document.body.style.overflow = '';
-        document.body.style.paddingRight = '';
-
-        // Execute callback after modal is closed
-        setTimeout(() => {
-            if (typeof callback === 'function') {
-
-                callback();
-            }
-        }, 100);
-    });
-
-    // Show the modal using Bootstrap
-    const winModal = new bootstrap.Modal(winModalEl);
-    winModal.show();
-}
-
-function createWinModal() {
-    const winModalEl = document.getElementById('winModal');
-
-    // Create modal content if it doesn't exist
-    if (!winModalEl.querySelector('.modal-dialog')) {
-        // Create modal structure
-        const modalDialog = document.createElement('div');
-        modalDialog.className = 'modal-dialog modal-dialog-centered';
-
-        const modalContent = document.createElement('div');
-        modalContent.className = 'modal-content bg-dark text-light';
-
-        const modalHeader = document.createElement('div');
-        modalHeader.className = 'modal-header';
-        modalHeader.innerHTML = '<h5 class="modal-title">Level Complete!</h5>';
-
-        const modalBody = document.createElement('div');
-        modalBody.className = 'modal-body';
-        modalBody.innerHTML = '<p>Congratulations! You finished the level.</p>';
-
-        const modalFooter = document.createElement('div');
-        modalFooter.className = 'modal-footer';
-
-        const continueBtn = document.createElement('button');
-        continueBtn.id = 'continueBtn';
-        continueBtn.className = 'btn btn-success';
-        continueBtn.textContent = 'Continue';
-        continueBtn.setAttribute('data-bs-dismiss', 'modal');
-
-        modalFooter.appendChild(continueBtn);
-        modalContent.appendChild(modalHeader);
-        modalContent.appendChild(modalBody);
-        modalContent.appendChild(modalFooter);
-        modalDialog.appendChild(modalContent);
-        winModalEl.appendChild(modalDialog);
-    }
-}
-
 // Input handling
 document.addEventListener('keydown', e => {
     keys[e.code] = true;
@@ -1178,7 +1033,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Level select menu logic
     const levelSelect = document.getElementById('levelSelect');
     const mainStartButton = document.getElementById('mainStartButton');
-    const startMenuContainer = document.getElementById('startMenuContainer');
     const maxLevel = 10; // Now supporting 10 levels
     function getUnlockedLevel() {
         const saved = localStorage.getItem('trustIssuesLevel');
@@ -1255,7 +1109,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- On-screen controls for mobile/tablet ---
-    const onscreenControls = document.querySelector('.onscreen-controls');
     const btnLeft = document.getElementById('btnLeft');
     const btnRight = document.getElementById('btnRight');
     const btnJump = document.getElementById('btnJump');
@@ -1301,8 +1154,6 @@ document.addEventListener('DOMContentLoaded', () => {
             gamePaused = true;
             showPausePopup();
         });
-    } else {
-
     }
 
     // Sound toggle
@@ -1403,14 +1254,9 @@ function showPausePopup() {
     const onscreenControls = document.querySelector('.onscreen-controls');
     const pausePopup = document.getElementById('pausePopup');
 
-
-
     // Show pause popup
     if (pausePopup) {
         pausePopup.classList.remove('hidden');
-
-    } else {
-
     }
 
     // Keep mobile/tablet controls visible but make pause popup accessible
@@ -1430,84 +1276,6 @@ document.addEventListener('DOMContentLoaded', () => {
         pausePopup.addEventListener('show', showPausePopup);
     }
 });
-
-function transitionToNextLevel(callback) {
-    const overlay = document.createElement('div');
-    overlay.style.position = 'absolute';
-    overlay.style.top = '0';
-    overlay.style.left = '0';
-    overlay.style.width = '100%';
-    overlay.style.height = '100%';
-    overlay.style.backgroundColor = 'black';
-    overlay.style.opacity = '0';
-    overlay.style.zIndex = '9999';
-    overlay.style.transition = 'opacity 1s ease-in-out';
-    document.body.appendChild(overlay);
-
-    // Start fade-out animation
-    setTimeout(() => {
-        overlay.style.opacity = '1';
-    }, 100);
-
-    // Wait for animation to complete, then load the next level
-    setTimeout(() => {
-        document.body.removeChild(overlay);
-        if (typeof callback === 'function') {
-            callback();
-        }
-    }, 1100); // 1 second fade-out + small buffer
-}
-
-function fallingThroughLayersTransition(callback) {
-    const layers = [
-        { color: '#F4A460', traps: [{ x: 200, y: 100, width: 50, height: 10, color: '#8B4513' }] },
-        { color: '#8B4513', traps: [{ x: 400, y: 200, width: 50, height: 10, color: '#FF4500' }] },
-        { color: '#C0C0C0', traps: [{ x: 600, y: 300, width: 50, height: 10, color: '#3B2F2F' }] }
-    ];
-
-    let playerY = 0; // Start falling from the top
-    const fallSpeed = 5; // Speed of falling
-    const layerHeight = canvas.height / layers.length; // Height of each layer
-
-    const animationInterval = setInterval(() => {
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Draw layers
-        layers.forEach((layer, index) => {
-            const layerY = index * layerHeight - playerY;
-            if (layerY >= -layerHeight && layerY <= canvas.height) {
-                ctx.fillStyle = layer.color;
-                ctx.fillRect(0, layerY, canvas.width, layerHeight);
-
-                // Draw traps
-                layer.traps.forEach(trap => {
-                    ctx.fillStyle = trap.color;
-                    ctx.fillRect(trap.x, layerY + trap.y, trap.width, trap.height);
-                });
-            }
-        });
-
-        // Draw player falling
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(canvas.width / 2 - player.width / 2, playerY, player.width, player.height);
-
-        // Update player position
-        playerY += fallSpeed;
-
-        // Stop animation when player reaches the bottom
-        if (playerY > canvas.height + layerHeight * (layers.length - 1)) {
-            clearInterval(animationInterval);
-
-            // Transition to the next level
-            setTimeout(() => {
-                if (typeof callback === 'function') {
-                    callback();
-                }
-            }, 500); // Small delay after animation
-        }
-    }, 1000 / 60); // Smooth animation (60 FPS)
-}
 
 function elevatorTransition(callback) {
     const layers = [
