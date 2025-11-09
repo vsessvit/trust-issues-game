@@ -64,8 +64,6 @@ function getSavedLevel() {
 
 // Start game logic
 function startGame(levelNum) {
-
-
     // Start game directly for all devices (desktop and mobile)
     actuallyStartGame(levelNum);
 }
