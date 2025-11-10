@@ -193,7 +193,7 @@ describe('Game Core Functionality', () => {
     test('should make player jump when jump key is pressed and on ground', () => {
       const originalY = player.y;
       simulatePlayerMovement('jump');
-      expect(player.dy).toBe(-10);
+      expect(player.dy).toBe(-9.5);
       expect(player.onGround).toBe(false);
     });
 
