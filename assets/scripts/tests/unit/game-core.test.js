@@ -1,6 +1,7 @@
 /**
  * @jest-environment jsdom
  */
+/* eslint-env jest */
 
 // Mock the game script variables and functions
 let currentLevel, player, gravity, keys, platforms, traps, lives, timer, gamePaused, playerDead, goalReached;
@@ -307,10 +308,11 @@ describe('Game Core Functionality', () => {
     });
 
     test('should save progress when completing level', () => {
+      const setItemSpy = jest.spyOn(global.localStorage, 'setItem');
       currentLevel = 3;
       global.localStorage.setItem('trustIssuesLevel', 4);
       
-      expect(global.localStorage.setItem).toHaveBeenCalledWith('trustIssuesLevel', 4);
+      expect(setItemSpy).toHaveBeenCalledWith('trustIssuesLevel', 4);
     });
   });
 
@@ -506,6 +508,7 @@ describe('Game Core Functionality', () => {
     });
 
     test('should handle level completion for non-final levels', () => {
+      const setItemSpy = jest.spyOn(global.localStorage, 'setItem');
       currentLevel = 5;
       goalReached = true;
       
@@ -514,7 +517,7 @@ describe('Game Core Functionality', () => {
         global.localStorage.setItem('trustIssuesLevel', currentLevel + 1);
       }
       
-      expect(global.localStorage.setItem).toHaveBeenCalledWith('trustIssuesLevel', 6);
+      expect(setItemSpy).toHaveBeenCalledWith('trustIssuesLevel', 6);
     });
 
     test('should handle game completion on level 10', () => {
