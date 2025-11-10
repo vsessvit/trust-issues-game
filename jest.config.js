@@ -29,7 +29,7 @@ module.exports = {
   transform: {},
   
   // Mock static assets
-  moduleNameMapping: {
+  moduleNameMapper: {
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '\\.(gif|ttf|eot|svg|png|jpg|jpeg)$': '<rootDir>/assets/scripts/tests/__mocks__/fileMock.js'
   }
