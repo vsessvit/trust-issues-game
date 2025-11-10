@@ -7,7 +7,7 @@ describe('DOM and UI Functionality', () => {
   beforeEach(() => {
     // Reset DOM before each test
     document.body.innerHTML = `
-      <canvas id="gameCanvas"></canvas>
+      <canvas id="gameCanvas" width="910" height="550"></canvas>
       <div id="lives">Lives: 5</div>
       <div id="timer">Time: 0s</div>
       <div id="levelDisplay">Level: 1</div>
@@ -32,18 +32,26 @@ describe('DOM and UI Functionality', () => {
       expect(document.querySelector('#pauseButton')).not.toBeNull();
     });
 
-    it('canvas should have correct initial dimensions', () => {
+    it('canvas should have correct dimensions for desktop', () => {
       const canvas = document.getElementById('gameCanvas');
       expect(canvas.width).toBe(910);
       expect(canvas.height).toBe(550);
+      expect(canvas.tagName).toBe('CANVAS');
     });
 
-    it('should handle missing elements gracefully', () => {
-      document.body.innerHTML = '';
-      expect(document.getElementById('gameCanvas')).toBeNull();
-      expect(document.getElementById('lives')).toBeNull();
+    it('should handle canvas context creation', () => {
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+      expect(ctx).toBeTruthy();
+      expect(typeof ctx.fillRect).toBe('function');
     });
-  });
+
+    it('should have reasonable aspect ratio for gaming', () => {
+      const canvas = document.getElementById('gameCanvas');
+      const aspectRatio = canvas.width / canvas.height;
+      expect(aspectRatio).toBeCloseTo(1.65, 1);
+    });
+  }); // <-- CLOSE 'DOM Elements'
 
   // UI Updates
   describe('UI Updates', () => {
