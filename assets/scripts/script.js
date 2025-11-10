@@ -964,6 +964,7 @@ document.addEventListener('keydown', e => {
         showRestartMessage = false;
         explosionTimer = 0;
         respawnAnimation = true;
+        gamePaused = true; // Pause game during restart to prevent double death
         // Instead of manually resetting player and traps, reload the level:
         loadLevel(currentLevel);
 
@@ -972,6 +973,7 @@ document.addEventListener('keydown', e => {
             player.dx = 0;
             player.dy = 0;
             keys = {};
+            gamePaused = false; // Resume game after restart is complete
         }, 1000);
         return;
     }
@@ -1398,12 +1400,14 @@ function handleCanvasRestart(e) {
         showRestartMessage = false;
         explosionTimer = 0;
         respawnAnimation = true;
+        gamePaused = true; // Pause game during restart to prevent double death
         loadLevel(currentLevel);
         setTimeout(() => {
             respawnAnimation = false;
             player.dx = 0;
             player.dy = 0;
             keys = {};
+            gamePaused = false; // Resume game after restart is complete
         }, 1000);
     }
 }
