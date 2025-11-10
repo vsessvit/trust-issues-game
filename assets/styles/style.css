@@ -773,10 +773,10 @@ footer {
     }
 
     .start-button {
-        font-size: 1.3rem;
-        padding: 1.2rem 2rem;
-        min-width: 200px;
-        min-height: 55px;
+        font-size: 1.2rem;
+        padding: 0.8rem 2.5rem;
+        min-width: 280px;
+        min-height: 45px;
     }
 
     .start-button-container {
@@ -942,10 +942,10 @@ footer {
     }
 
     .start-button {
-        font-size: 1.8rem;
-        padding: 1.5rem 2.8rem;
-        min-width: 280px;
-        min-height: 70px;
+        font-size: clamp(1.4rem, 2.5vw, 2rem);
+        padding: clamp(0.8rem, 1.5vw, 1.2rem) clamp(2.5rem, 4vw, 4rem);
+        min-width: clamp(320px, 40vw, 480px);
+        min-height: clamp(45px, 6vh, 70px);
     }
 
     .left-controls {
