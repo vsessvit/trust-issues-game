@@ -1000,13 +1000,13 @@ checkOrientation();
 // Instructions text
 const instructionsText = {
     en: "Use arrow keys or spacebar to move and jump. Avoid traps and reach the goal. Expect the unexpected!",
-    uk: "Використовуйте стрілки або пробіл для руху та стрибків. Уникайте пасток і дістаньтеся до мети. Очікуйте несподіванки!",
+    ua: "Використовуйте стрілки або пробіл для руху та стрибків. Уникайте пасток і дістаньтеся до мети. Очікуйте несподіванки!",
     es: "Usa las flechas o la barra espaciadora para moverte y saltar. Evita las trampas y alcanza la meta. ¡Espera lo inesperado!"
 };
 
 const startButtonText = {
     en: "Press Enter or Tap to Start the Game",
-    uk: "Натисніть Enter або торкніться, щоб почати гру",
+    ua: "Натисніть Enter або торкніться, щоб почати гру",
     es: "Presiona Enter o toca para comenzar el juego"
 };
 
