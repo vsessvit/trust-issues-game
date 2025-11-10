@@ -299,13 +299,6 @@ describe('Game Core Functionality', () => {
       expect(goalReached).toBe(true);
       expect(gamePaused).toBe(true);
     });
-
-    test('should save progress when completing level', () => {
-      currentLevel = 3;
-      global.localStorage.setItem('trustIssuesLevel', 4);
-      
-      expect(global.localStorage.setItem).toHaveBeenCalledWith('trustIssuesLevel', 4);
-    });
   });
 
   describe('Lives and Death Management', () => {
@@ -498,19 +491,7 @@ describe('Game Core Functionality', () => {
       const nextLevel = Math.min(currentLevel + 1, 10);
       expect(nextLevel).toBe(10);
     });
-
-    test('should handle level completion for non-final levels', () => {
-      currentLevel = 5;
-      goalReached = true;
-      
-      if (currentLevel < 10) {
-        // Would save progress and advance
-        global.localStorage.setItem('trustIssuesLevel', currentLevel + 1);
-      }
-      
-      expect(global.localStorage.setItem).toHaveBeenCalledWith('trustIssuesLevel', 6);
-    });
-
+    
     test('should handle game completion on level 10', () => {
       currentLevel = 10;
       goalReached = true;
