@@ -12,11 +12,11 @@
   },
   "license": "ISC",
   "author": "",
-  "type": "jest",
   "main": "assets/scripts/script.js",
   "scripts": {
     "lint": "eslint assets/scripts/script.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "acorn": "^8.15.0",
@@ -91,6 +91,8 @@
     "@eslint/js": "^9.39.1",
     "eslint": "^9.39.1",
     "globals": "^16.5.0",
-    "jest": "^26.6.3"
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^26.6.3",
+    "jest-environment-jsdom": "^26.6.2"
   }
 }
