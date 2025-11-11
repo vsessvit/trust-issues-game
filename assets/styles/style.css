@@ -1569,4 +1569,20 @@ footer {
     }
 }
 
+/* Laptop specific rules (1201px to 1399px) */
+@media (min-width: 1201px) and (max-width: 1399px) {
+    .instructions-centered {
+        top: 30% !important;
+    }
+
+    body .onscreen-controls,
+    body .onscreen-controls.active,
+    .game-container.game-active .onscreen-controls.active {
+        display: none !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        visibility: hidden !important;
+    }
+}
+
 
