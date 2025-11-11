@@ -1006,8 +1006,8 @@ footer {
     }
 
     .level-btn {
-        flex: 0 0 calc(30% - 12px);
-        max-width: calc(30% - 12px);
+        flex: 0 0 calc(20% - 10px);
+        max-width: calc(20% - 10px);
         min-width: 60px;
         min-height: 50px;
         font-size: 1.1rem;
@@ -1396,8 +1396,8 @@ footer {
     }
 
     .level-select {
-        gap: 24px;
-        max-width: 944px;
+        gap: 10px;
+        max-width: 600px;
         margin-top: 10px;
         margin-bottom: 0;
         display: flex;
@@ -1408,11 +1408,14 @@ footer {
     }
 
     .level-btn {
+        flex: 0 0 calc(20% - 10px);
+        max-width: calc(20% - 10px);
         font-size: 1.6rem;
         padding: 18px 36px;
         min-width: 90px;
         min-height: 70px;
         border-radius: 14px;
+        box-sizing: border-box;
     }
 
     .left-controls button {
