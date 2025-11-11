@@ -711,7 +711,7 @@ function handleCanvasTouch(e) {
         x >= pauseBtnX && x <= pauseBtnX + pauseBtnW &&
         y >= pauseBtnY && y <= pauseBtnY + pauseBtnH
     ) {
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
         gamePaused = true;
         showPausePopup();
     }
@@ -1121,14 +1121,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnLeft && btnRight && btnJump) {
         // Touch events for left
-        btnLeft.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('ArrowLeft', true); }, { passive: false });
-        btnLeft.addEventListener('touchend', e => { e.preventDefault(); triggerKey('ArrowLeft', false); }, { passive: false });
+        btnLeft.addEventListener('touchstart', e => { if (e.cancelable) e.preventDefault(); triggerKey('ArrowLeft', true); }, { passive: false });
+        btnLeft.addEventListener('touchend', e => { if (e.cancelable) e.preventDefault(); triggerKey('ArrowLeft', false); }, { passive: false });
         // Touch events for right
-        btnRight.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('ArrowRight', true); }, { passive: false });
-        btnRight.addEventListener('touchend', e => { e.preventDefault(); triggerKey('ArrowRight', false); }, { passive: false });
+        btnRight.addEventListener('touchstart', e => { if (e.cancelable) e.preventDefault(); triggerKey('ArrowRight', true); }, { passive: false });
+        btnRight.addEventListener('touchend', e => { if (e.cancelable) e.preventDefault(); triggerKey('ArrowRight', false); }, { passive: false });
         // Touch events for jump (space)
-        btnJump.addEventListener('touchstart', e => { e.preventDefault(); triggerKey('Space', true); }, { passive: false });
-        btnJump.addEventListener('touchend', e => { e.preventDefault(); triggerKey('Space', false); }, { passive: false });
+        btnJump.addEventListener('touchstart', e => { if (e.cancelable) e.preventDefault(); triggerKey('Space', true); }, { passive: false });
+        btnJump.addEventListener('touchend', e => { if (e.cancelable) e.preventDefault(); triggerKey('Space', false); }, { passive: false });
         // Mouse fallback for desktop testing
         btnLeft.addEventListener('mousedown', e => { e.preventDefault(); triggerKey('ArrowLeft', true); });
         btnLeft.addEventListener('mouseup', e => { e.preventDefault(); triggerKey('ArrowLeft', false); });
@@ -1141,7 +1141,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Pause button for mobile
     if (btnPause) {
         btnPause.addEventListener('touchstart', e => {
-            e.preventDefault();
+            if (e.cancelable) e.preventDefault();
             e.stopPropagation();
 
             gamePaused = true;
